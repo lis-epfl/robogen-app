@@ -1,16 +1,20 @@
 <template>
   <form class="vue-form" @submit.prevent="submit">
     <fieldset>
-      <legend>Evolver Configuration</legend>
+      <div class="row">
+          <div class="col-sm-8" style="padding:0"> <legend>Evolver Configuration <legend style="font-size:16px">{{name}}.evol.txt <span v-if="!saved" style="cursor:pointer; text-decoration:underline; color:blue" @click="save_evol_file">Save</span></legend></legend></div>
+          <div class="col-sm-4" style="padding:0"><input type="button" value="Load File" @click="open_file"></div>
+      </div>
+      
       <div class="row">
         <div class="col-sm-6">
             <label class="label" for="robot">Robot File (Optional for full evolution)</label>
-            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :'robot.txt'}]"></file-select>
+            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :'robot.txt'}]" :defaultPath="projectFolderPath" ref="robotFile"></file-select>
             <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
         </div>
         <div class="col-sm-6">
             <label class="label" for="ff">Simulation File (Required) </label>
-            <file-select v-model="simFile" :accept="[{'name': 'Robogen Simulation File', 'ext' :'sim.txt'}]"></file-select>
+            <file-select v-model="simFile" :accept="[{'name': 'Robogen Simulation File', 'ext' :'sim.txt'}]" :defaultPath="projectFolderPath" ref="simFile"></file-select>
         </div>
       </div>
       <div class="row">
@@ -153,13 +157,15 @@
       
 
       <div class="row">
+        
         <div class="debug-simulate">
+          <div class="robotFileInEvolve"> {{referenceRobotFile}}</div>
             <pre><code>{{ simConfig }}</code></pre>
         </div>
       </div>
 
       <div class="row">
-        <input type="submit" value="Save" :disabled="!isValid" @click="save_sim_file">
+        <input type="submit" value="Save" :disabled="!isValid" @click="save_evol_file">
         <div style="position:absolute; right:70px" >
         <input type="button" value="Test Me" :disabled="!isValid" @click="testEvol" >
         </div>
@@ -175,11 +181,26 @@ var os = require('os')
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
 const process = require('child_process') // The power of Node.JS
 export default {
+  props: {
+    mainFolderPath: {
+      type: String
+    },
+    projectFolderPath: {
+      type: String
+    },
+    simFiles: {
+      type: Array
+    },
+    robotFiles: {
+      type: Array
+    }
+  },
   components: {
     FileSelect
   },
   data: function () {
     return {
+      name: '',
       evolutionMode: 'brain',
       numGenerations: 40,
       mu: 20,
@@ -200,16 +221,103 @@ export default {
       content: '',
       saved: false,
       filepath: '',
-      cpuCount: 1
+      cpuCount: 1,
+      referenceRobotFile: '',
+      localProjectFolderPath: this.projectFolderPath,
+      localSimFiles: this.simFiles,
+      localRobotFiles: this.robotFiles,
+      localMainFolerPath: this.mainFolderPath
     }
   },
-  methods: {
-    save_sim_file: function () {
+  methods: {// Load file
+    open_file: function () {
+      dialog.showOpenDialog({
+        filters: [
+          { name: 'Robogen Evolution File', extensions: ['evol.txt'] }
+        ],
+        defaultPath: this.projectFolderPath
+      }, (fileNames) => {
+        // fileNames is an array that contains all the selected
+        if (fileNames === undefined) {
+          console.log('No file selected')
+          return
+        }
+        this.load_evol_file(fileNames[0])
+      })
+    },
+    load_evol_file: function (fileName) {
+      fs.readFile(fileName, 'utf-8', (err, data) => {
+        if (err) {
+          alert('An error ocurred reading the file :' + err.message)
+          return
+        }
+        this.name = fileName.substring(fileName.lastIndexOf('/') + 1, fileName.indexOf('.'))
+        var params = data.split('\n')
+        this.other = ''
+
+        for (var i = 0; i < params.length; i++) {
+          var param = params[i]
+          if (param.indexOf('#') > -1) {
+            // Remove all comments
+            param = param.substring(0, param.indexOf('#'))
+          }
+          // Remove all spaces
+          param = param.split(' ').join('')
+          if (param.length > 0) {
+            this.updateData(param)
+          }
+        }
+      })
+      this.saved = true
+      if (this.robotFiles.length === 1) {
+        this.robotFile = this.projectFolderPath + '/' + this.robotFiles[0]
+        this.$refs.robotFile.updateFilePath(this.robotFile)
+      }
+    },
+    updateData: function (param) {
+      if (param.includes('simulatorConfFile=')) {
+        this.simFile = param.substring('simulatorConfFile='.length)
+        this.$refs.simFile.updateFilePath(this.projectFolderPath + '/' + this.simFile)
+      } else if (param.includes('evolutionMode=')) {
+        this.evolutionMode = param.substring('evolutionMode='.length)
+      } else if (param.includes('numGenerations=')) {
+        this.numGenerations = param.substring('numGenerations='.length)
+      } else if (param.includes('mu=')) {
+        this.mu = param.substring('mu='.length)
+      } else if (param.includes('lambda=')) {
+        this.lambda = param.substring('lambda='.length)
+      } else if (param.includes('replacement=')) {
+        this.replacement = param.substring('replacement='.length)
+      } else if (param.includes('selection=')) {
+        this.selection = param.substring('selection='.length)
+      } else if (param.includes('tournamentSize=')) {
+        this.tournamentSize = param.substring('tournamentSize='.length)
+      } else if (param.includes('pBrainMutate=')) {
+        this.pBrainMutate = param.substring('pBrainMutate='.length)
+      } else if (param.includes('pBrainCrossover=')) {
+        this.pBrainCrossover = param.substring('pBrainCrossover='.length)
+      } else if (param.includes('pAddHiddenNeuron=')) {
+        this.pAddHiddenNeuron = param.substring('pAddHiddenNeuron='.length)
+      } else if (param.includes('pOscillatorNeuron=')) {
+        this.pOscillatorNeuron = param.substring('pOscillatorNeuron='.length)
+      } else if (param.includes('numInitialParts=')) {
+        this.numInitialParts = param.substring('numInitialParts='.length)
+      } else if (param.includes('addBodyPart=')) {
+        this.addBodyPart = param.substring('addBodyPart='.length)
+      } else if (param.includes('maxBodyParts=')) {
+        this.maxBodyParts = param.substring('maxBodyParts='.length)
+      } else if (param.includes('socket=') || param.includes('brainBounds=') || param.includes('brainSigma=')) {
+        // Do nothing
+      } else {
+        this.other += param + '\n'
+      }
+    },
+    save_evol_file: function () {
       var self = this
       // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
       dialog.showSaveDialog(
         {
-          defaultPath: this.name + '.evol.txt',
+          defaultPath: this.projectFolderPath + '/' + this.name + '.evol.txt',
           filters: [{ name: 'Robogen Evol File', extensions: ['evol.txt'] }]
         },
         fileName => {
@@ -264,6 +372,9 @@ export default {
           self.testEvol()
         }
       }
+    },
+    getFileName: function (filePath) {
+      return filePath.substring(filePath.lastIndexOf('/') + 1)
     }
   },
   computed: {
@@ -272,11 +383,11 @@ export default {
       this.content = ''
 
       if (this.robotFile === '') {
-        this.content += '#Evolution from scratch\n\n'
+        this.referenceRobotFile = '#Evolution from scratch'
       } else {
-        this.content += 'referenceRobotFile=' + this.robotFile + '\n\n'
+        this.referenceRobotFile = 'referenceRobotFile=' + this.getFileName(this.robotFile) + '\n\n'
       }
-      this.content += 'simulatorConfFile=' + this.simFile + '\n'
+      this.content += 'simulatorConfFile=' + this.getFileName(this.simFile) + '\n'
       this.content += 'evolutionMode = ' + this.evolutionMode + '\n'
       this.content += 'numGenerations = ' + this.numGenerations + '\n'
       this.content += 'mu = ' + this.mu + '\n'
@@ -339,6 +450,15 @@ export default {
   font-weight: 300;
   white-space: pre-wrap;
   tab-size: 2;
+}
+
+.robotFileInEvolve{
+  margin-top: 5px;
+  font-family: "Source Code Pro", monospace;
+  color: rgb(82, 156, 230);
+  font-weight: 800;
+  font-size: 17px;
+  margin-bottom: 5px;
 }
 
 .tablist {

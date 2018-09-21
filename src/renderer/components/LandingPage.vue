@@ -23,7 +23,7 @@
           <!-- <div class="build">Anand</div> -->
           <Build v-show="display==='build'" :projectFolderPath="projectFolderPath" :mainFolderPath="mainFolderPath" :robotFiles="robotFiles" ref="build"></Build>
           <Simulate v-show="display==='simulate'" :projectFolderPath="projectFolderPath" :mainFolderPath="mainFolderPath" :simFiles="simFiles" :robotFiles="robotFiles" ref="sim"></Simulate>
-          <Evolve v-show="display==='evolve'"></Evolve>
+          <Evolve v-show="display==='evolve'" :projectFolderPath="projectFolderPath" :mainFolderPath="mainFolderPath" :simFiles="simFiles" :robotFiles="robotFiles"></Evolve>
         </div>
       </div>
     </main>

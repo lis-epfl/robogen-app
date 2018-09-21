@@ -136,9 +136,11 @@ export default {
         for (var i = 0; i < params.length; i++) {
           var param = params[i]
           if (param.indexOf('#') > -1) {
+            // Remove all comments
             param = param.substring(0, param.indexOf('#'))
           }
-          param = param.replace(' ', '')
+          // Remove all spaces
+          param = param.split(' ').join('')
           if (param.length > 0) {
             this.updateData(param)
           }
