@@ -20,6 +20,7 @@
                   <p><span class="file-type">Simulation File:</span> <span class="file-name">{{simFiles}}</span></p>
                   <p><span class="file-type">Evolution File:</span> <span class="file-name">{{evolFiles}}</span></p>
                   <p><span class="file-type">Other File(s):</span> <span class="file-name">{{otherFiles}}</span></p>
+                  <p><span class="file-type">Result Folder(s):</span> <span class="file-name">{{resultFolders}}</span></p>
                   <p class="errormsg">{{errorProjectFiles}}</p>
                 </div>
             </div>
@@ -66,7 +67,8 @@ export default {
       scenarioFiles: '',
       evolFiles: '',
       otherFiles: [],
-      errorProjectFiles: ''
+      errorProjectFiles: '',
+      resultFolders: []
     }
   },
   methods: {
@@ -102,7 +104,20 @@ export default {
       this.checkFileError('evolution file', this.evolFiles)
       this.checkFileError('scenario/fitness function file', this.scenarioFiles)
 
-      this.$parent.fileUpdate(this.mainFolderPath, this.projectFolderPath, this.robotFiles, this.simFiles, this.evolFiles)
+      this.$parent.fileUpdate(this.mainFolderPath, this.projectFolderPath, this.robotFiles, this.simFiles, this.evolFiles, this.resultFolders)
+    },
+    isDirectory (filepath, filename) {
+      console.log(filename.includes('.'))
+      if (filename.includes('.')) {
+        return false
+      } else {
+        var folderPath = filepath + '/' + filename
+        var stat = fs.statSync(folderPath)
+        if (stat.isDirectory()) {
+          return true
+        }
+        return false
+      }
     }
   },
   computed: {
@@ -120,7 +135,9 @@ export default {
         this.simFiles = []
         this.scenarioFiles = []
         this.evolFiles = []
+        this.resultFolders = []
         var files = fs.readdirSync(filepath)
+        console.log(files)
         for (var i = 0; i < files.length; i++) {
           if (files[i].includes('.robot.txt')) {
             this.robotFiles.push(files[i])
@@ -130,6 +147,8 @@ export default {
             this.evolFiles.push(files[i])
           } else if (files[i].includes('.js')) {
             this.scenarioFiles.push(files[i])
+          } else if (this.isDirectory(filepath, files[i])) {
+            this.resultFolders.push(files[i])
           } else {
             this.otherFiles.push(files[i])
           }

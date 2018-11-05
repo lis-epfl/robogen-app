@@ -18,15 +18,6 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-4" style="display:none">
-          <h4>Team Member</h4>
-          <p class="select">
-            <select >
-              <option value="0">Sarah Drasner</option>
-              <option value="1">Evan You</option>
-            </select>
-          </p>
-        </div>
         <div class="col-sm-3">
           <label class="label" for="vue-form-list">Evolution Mode </label>
           <ul class="vue-form-list">
@@ -193,6 +184,9 @@ export default {
     },
     robotFiles: {
       type: Array
+    },
+    evolFiles: {
+      type: Array
     }
   },
   components: {
@@ -225,6 +219,7 @@ export default {
       referenceRobotFile: '',
       localProjectFolderPath: this.projectFolderPath,
       localSimFiles: this.simFiles,
+      localEvolFiles: this.evolFiles,
       localRobotFiles: this.robotFiles,
       localMainFolerPath: this.mainFolderPath
     }
@@ -350,7 +345,16 @@ export default {
           self.filepath.length
         )
         console.log(file)
-        var ls = process.spawn('./scripts/evol/evol.sh', [file])
+        console.log(file.lastIndexOf('/'))
+
+        var folder = file.substring(
+          0,
+          file.lastIndexOf('/')
+        )
+
+        console.log(file)
+        console.log(folder)
+        var ls = process.spawn('./scripts/evol/evol.sh', [file, folder])
 
         ls.stdout.on('data', function (data) {
           console.log('stdout: <' + data + '> ')
@@ -422,7 +426,49 @@ export default {
       if (this.evolutionMode === 'brain' && this.robotFile === '') {
         alert('Brain evolution requires initial robot morphology')
       }
+    },
+    update: function () {
+      if (this.evolFiles.length > 0) {
+        this.load_evol_file(this.projectFolderPath + '/' + this.evolFiles[0])
+        console.log(this.mainFolderPath)
+      } else {
+        this.$data = {
+          name: '',
+          evolutionMode: 'brain',
+          numGenerations: 40,
+          mu: 20,
+          lambda: 20,
+          replacement: 'plus',
+          selection: 'deterministic-tournament',
+          tournamentSize: 2,
+          pBrainMutate: 0.5,
+          pBrainCrossover: 0,
+          pAddHiddenNeuron: 0,
+          pOscillatorNeuron: 0,
+          numInitialParts: '2:10',
+          addBodyPart: 'All',
+          maxBodyParts: '20',
+          other: '',
+          simFile: '',
+          robotFile: '',
+          content: '',
+          saved: false,
+          filepath: '',
+          cpuCount: 1,
+          referenceRobotFile: '',
+          localProjectFolderPath: this.projectFolderPath,
+          localSimFiles: this.simFiles,
+          localEvolFiles: this.evolFiles,
+          localRobotFiles: this.robotFiles,
+          localMainFolerPath: this.mainFolderPath
+        }
+      }
+      this.saved = true
     }
+  },
+  watch: {
+    // saveCheck () {},
+    update () {}
   },
   mounted () {
     this.cpuCount = os.cpus().length
