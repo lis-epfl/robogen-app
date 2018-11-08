@@ -2,7 +2,7 @@ PWD=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 SRC_DIR=$PWD/examples
 echo $SRC_DIR
 xhost +
-docker run -it -d --rm --privileged \
+docker run -it -d --user $(id -u):$(id -g) --rm \
 	--name robogen1_2 \
 	--expose=49152 \
 	--mount type=bind,source="${SRC_DIR}",target=/robogen/examples,bind-propagation=rshared \

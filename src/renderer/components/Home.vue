@@ -137,7 +137,6 @@ export default {
         this.evolFiles = []
         this.resultFolders = []
         var files = fs.readdirSync(filepath)
-        console.log(files)
         for (var i = 0; i < files.length; i++) {
           if (files[i].includes('.robot.txt')) {
             this.robotFiles.push(files[i])

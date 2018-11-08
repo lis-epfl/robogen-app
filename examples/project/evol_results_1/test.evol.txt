@@ -1,8 +1,8 @@
 simulatorConfFile=test.sim.txt
 evolutionMode = full
-numGenerations = 40
-mu = 20
-lambda = 20
+numGenerations = 35
+mu = 5
+lambda = 5
 replacement = plus
 selection = deterministic-tournament
 tournamentSize = 2

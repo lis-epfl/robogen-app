@@ -168,7 +168,6 @@
 import FileSelect from './Helper/FileSelect.vue'
 var app = require('electron').remote
 var dialog = app.dialog
-var os = require('os')
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
 const process = require('child_process') // The power of Node.JS
 export default {
@@ -337,7 +336,7 @@ export default {
       var self = this
       if (this.saved) {
         if (!self.filepath.includes('examples')) {
-          alert('Only the files in the example folder can used')
+          alert('Only the files in the example folder can used. Current filepath = ' + self.filepath)
           return
         }
         var file = self.filepath.substring(
@@ -354,10 +353,12 @@ export default {
 
         console.log(file)
         console.log(folder)
+        Event.$emit('newEvol')
         var ls = process.spawn('./scripts/evol/evol.sh', [file, folder])
 
         ls.stdout.on('data', function (data) {
-          console.log('stdout: <' + data + '> ')
+          // console.log('stdout: <' + data + '> ')
+          Event.$emit('newData', data)
         })
 
         ls.stderr.on('data', function (data) {
@@ -371,7 +372,7 @@ export default {
           // getDroidOutput().style.background = 'DarkGray'
         })
       } else {
-        self.save_sim_file()
+        self.save_evol_file()
         if (self.saved) {
           self.testEvol()
         }
@@ -469,9 +470,6 @@ export default {
   watch: {
     // saveCheck () {},
     update () {}
-  },
-  mounted () {
-    this.cpuCount = os.cpus().length
   }
 }
 </script>

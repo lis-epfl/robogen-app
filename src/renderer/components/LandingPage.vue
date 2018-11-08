@@ -81,6 +81,12 @@ export default {
       // this.$refs.sim.saveFromParrent()
       // this.$refs.evol.saveFromParrent()
     }
+  },
+  created () {
+    var self = this
+    Event.$on('newEvol', function (msg) {
+      self.display = 'results'
+    })
   }
 }
 </script>

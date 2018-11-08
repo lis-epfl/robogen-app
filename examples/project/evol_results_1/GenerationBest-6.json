@@ -9,101 +9,135 @@
     "orientation": 0
    },
    {
-    "id": "myid1000",
-    "type": "LightSensor",
-    "root": false,
-    "orientation": 2
-   },
-   {
     "id": "myid1001",
     "type": "ActiveHinge",
     "root": false,
-    "orientation": 1
+    "orientation": 2
    },
    {
-    "id": "myid1002",
+    "id": "myid1008",
+    "type": "FixedBrick",
+    "root": false,
+    "orientation": 3
+   },
+   {
+    "id": "myid1006",
+    "type": "ParametricJoint",
+    "root": false,
+    "evolvableParam": [
+     {
+      "paramValue": 0.080011546611785889
+     },
+     {
+      "paramValue": 22.325397491455078
+     },
+     {
+      "paramValue": 0.0
+     }
+    ],
+    "orientation": 0
+   },
+   {
+    "id": "myid1004",
+    "type": "PassiveHinge",
+    "root": false,
+    "orientation": 0
+   },
+   {
+    "id": "myid1007",
     "type": "ActiveHinge",
     "root": false,
     "orientation": 1
    },
    {
-    "id": "myid1007",
-    "type": "FixedBrick",
-    "root": false,
-    "orientation": 0
-   },
-   {
-    "id": "myid1006",
-    "type": "FixedBrick",
-    "root": false,
-    "orientation": 2
-   },
-   {
-    "id": "myid1004",
-    "type": "FixedBrick",
-    "root": false,
-    "orientation": 2
-   },
-   {
     "id": "myid1003",
+    "type": "ParametricJoint",
+    "root": false,
+    "evolvableParam": [
+     {
+      "paramValue": 0.053688608109951019
+     },
+     {
+      "paramValue": 30.897735595703125
+     },
+     {
+      "paramValue": 0.0
+     }
+    ],
+    "orientation": 2
+   },
+   {
+    "id": "myid1002",
     "type": "LightSensor",
     "root": false,
-    "orientation": 0
+    "orientation": 3
    },
    {
     "id": "myid1005",
+    "type": "ActiveHinge",
+    "root": false,
+    "orientation": 3
+   },
+   {
+    "id": "myid1000",
     "type": "LightSensor",
     "root": false,
-    "orientation": 0
+    "orientation": 3
    }
   ],
   "connection": [
    {
     "src": "CoreComponent",
-    "dest": "myid1000",
+    "dest": "myid1001",
     "srcSlot": 0,
     "destSlot": 0
    },
    {
-    "src": "CoreComponent",
-    "dest": "myid1001",
-    "srcSlot": 1,
-    "destSlot": 0
-   },
-   {
     "src": "myid1001",
-    "dest": "myid1002",
+    "dest": "myid1008",
     "srcSlot": 1,
     "destSlot": 0
    },
    {
-    "src": "myid1002",
+    "src": "myid1008",
+    "dest": "myid1006",
+    "srcSlot": 1,
+    "destSlot": 0
+   },
+   {
+    "src": "myid1006",
+    "dest": "myid1004",
+    "srcSlot": 1,
+    "destSlot": 0
+   },
+   {
+    "src": "myid1004",
     "dest": "myid1007",
     "srcSlot": 1,
     "destSlot": 0
    },
    {
     "src": "myid1007",
-    "dest": "myid1006",
-    "srcSlot": 3,
-    "destSlot": 0
-   },
-   {
-    "src": "myid1006",
-    "dest": "myid1004",
-    "srcSlot": 3,
-    "destSlot": 0
-   },
-   {
-    "src": "myid1004",
     "dest": "myid1003",
+    "srcSlot": 1,
+    "destSlot": 0
+   },
+   {
+    "src": "myid1003",
+    "dest": "myid1002",
     "srcSlot": 1,
     "destSlot": 0
    },
    {
     "src": "CoreComponent",
     "dest": "myid1005",
-    "srcSlot": 3,
+    "srcSlot": 2,
+    "destSlot": 0
+   },
+   {
+    "src": "myid1005",
+    "dest": "myid1000",
+    "srcSlot": 1,
     "destSlot": 0
    }
   ]
@@ -170,33 +204,34 @@
     "id": "myid1001-0",
     "layer": "output",
     "type": "sigmoid",
-    "bias": 1.7895607948303223,
+    "bias": 0.01144942082464695,
     "bodyPartId": "myid1001",
     "ioId": 0,
     "gain": 1.0
    },
    {
     "id": "myid1002-0",
-    "layer": "output",
-    "type": "sigmoid",
-    "bias": -0.26946526765823364,
+    "layer": "input",
+    "type": "simple",
     "bodyPartId": "myid1002",
     "ioId": 0,
     "gain": 1.0
    },
    {
-    "id": "myid1003-0",
-    "layer": "input",
-    "type": "simple",
-    "bodyPartId": "myid1003",
+    "id": "myid1005-0",
+    "layer": "output",
+    "type": "sigmoid",
+    "bias": 1.0829651355743408,
+    "bodyPartId": "myid1005",
     "ioId": 0,
     "gain": 1.0
    },
    {
-    "id": "myid1005-0",
-    "layer": "input",
-    "type": "simple",
-    "bodyPartId": "myid1005",
+    "id": "myid1007-0",
+    "layer": "output",
+    "type": "sigmoid",
+    "bias": 3.0,
+    "bodyPartId": "myid1007",
     "ioId": 0,
     "gain": 1.0
    }
@@ -205,112 +240,167 @@
    {
     "src": "CoreComponent-0",
     "dest": "myid1001-0",
-    "weight": -0.72068190574645996
+    "weight": -0.38994088768959045
    },
    {
     "src": "CoreComponent-0",
-    "dest": "myid1002-0",
-    "weight": 0.0
+    "dest": "myid1005-0",
+    "weight": 0.0092799952253699303
+   },
+   {
+    "src": "CoreComponent-0",
+    "dest": "myid1007-0",
+    "weight": 1.0434939861297607
    },
    {
     "src": "CoreComponent-1",
     "dest": "myid1001-0",
-    "weight": 0.68250668048858643
+    "weight": 1.8808867931365967
    },
    {
     "src": "CoreComponent-1",
-    "dest": "myid1002-0",
-    "weight": -0.11664824187755585
+    "dest": "myid1005-0",
+    "weight": 0.06363234668970108
+   },
+   {
+    "src": "CoreComponent-1",
+    "dest": "myid1007-0",
+    "weight": -0.4605366587638855
    },
    {
     "src": "CoreComponent-2",
     "dest": "myid1001-0",
-    "weight": -0.35448861122131348
+    "weight": 0.32573661208152771
    },
    {
     "src": "CoreComponent-2",
-    "dest": "myid1002-0",
-    "weight": 0.0
+    "dest": "myid1005-0",
+    "weight": 1.5349136590957642
+   },
+   {
+    "src": "CoreComponent-2",
+    "dest": "myid1007-0",
+    "weight": 0.22908623516559601
    },
    {
     "src": "CoreComponent-3",
     "dest": "myid1001-0",
-    "weight": -2.0709419250488281
+    "weight": 0.26888948678970337
    },
    {
     "src": "CoreComponent-3",
-    "dest": "myid1002-0",
-    "weight": -0.68621534109115601
+    "dest": "myid1005-0",
+    "weight": -0.60081923007965088
+   },
+   {
+    "src": "CoreComponent-3",
+    "dest": "myid1007-0",
+    "weight": 0.022229140624403954
    },
    {
     "src": "CoreComponent-4",
     "dest": "myid1001-0",
-    "weight": -0.68914550542831421
+    "weight": 0.64125210046768188
    },
    {
     "src": "CoreComponent-4",
-    "dest": "myid1002-0",
-    "weight": -0.67194217443466187
+    "dest": "myid1005-0",
+    "weight": -0.76486694812774658
+   },
+   {
+    "src": "CoreComponent-4",
+    "dest": "myid1007-0",
+    "weight": -0.038924001157283783
    },
    {
     "src": "CoreComponent-5",
     "dest": "myid1001-0",
-    "weight": -0.91864526271820068
+    "weight": -0.27079838514328003
    },
    {
     "src": "CoreComponent-5",
-    "dest": "myid1002-0",
-    "weight": 0.85529196262359619
+    "dest": "myid1005-0",
+    "weight": 0.14805547893047333
+   },
+   {
+    "src": "CoreComponent-5",
+    "dest": "myid1007-0",
+    "weight": -1.0550276041030884
    },
    {
     "src": "myid1000-0",
     "dest": "myid1001-0",
-    "weight": 0.44066596031188965
+    "weight": -0.98125767707824707
    },
    {
     "src": "myid1000-0",
-    "dest": "myid1002-0",
-    "weight": 0.20263464748859406
+    "dest": "myid1005-0",
+    "weight": -0.83311516046524048
+   },
+   {
+    "src": "myid1000-0",
+    "dest": "myid1007-0",
+    "weight": -0.21566368639469147
    },
    {
     "src": "myid1001-0",
     "dest": "myid1001-0",
-    "weight": 0.0
+    "weight": -0.1541210412979126
    },
    {
     "src": "myid1001-0",
-    "dest": "myid1002-0",
-    "weight": -0.88421809673309326
+    "dest": "myid1005-0",
+    "weight": 0.44286048412322998
+   },
+   {
+    "src": "myid1001-0",
+    "dest": "myid1007-0",
+    "weight": 0.081929758191108704
    },
    {
     "src": "myid1002-0",
     "dest": "myid1001-0",
-    "weight": 0.42955943942070007
+    "weight": -0.35331535339355469
    },
    {
     "src": "myid1002-0",
-    "dest": "myid1002-0",
-    "weight": 0.0015124540077522397
+    "dest": "myid1005-0",
+    "weight": 1.4191817045211792
    },
    {
-    "src": "myid1003-0",
-    "dest": "myid1001-0",
-    "weight": 0.5922425389289856
-   },
-   {
-    "src": "myid1003-0",
-    "dest": "myid1002-0",
-    "weight": 0.0
+    "src": "myid1002-0",
+    "dest": "myid1007-0",
+    "weight": 0.32286182045936584
    },
    {
     "src": "myid1005-0",
     "dest": "myid1001-0",
-    "weight": 0.0
+    "weight": 1.3517954349517822
    },
    {
     "src": "myid1005-0",
-    "dest": "myid1002-0",
-    "weight": -0.85932159423828125
+    "dest": "myid1005-0",
+    "weight": -0.74323606491088867
+   },
+   {
+    "src": "myid1005-0",
+    "dest": "myid1007-0",
+    "weight": -0.27435266971588135
+   },
+   {
+    "src": "myid1007-0",
+    "dest": "myid1001-0",
+    "weight": -0.32561391592025757
+   },
+   {
+    "src": "myid1007-0",
+    "dest": "myid1005-0",
+    "weight": -2.1840860843658447
+   },
+   {
+    "src": "myid1007-0",
+    "dest": "myid1007-0",
+    "weight": -0.81523573398590088
    }
   ]
  }

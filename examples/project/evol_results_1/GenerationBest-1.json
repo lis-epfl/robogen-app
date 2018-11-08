@@ -9,45 +9,16 @@
     "orientation": 0
    },
    {
-    "id": "myid1002",
-    "type": "PassiveHinge",
-    "root": false,
-    "orientation": 0
-   },
-   {
-    "id": "myid1004",
-    "type": "FixedBrick",
-    "root": false,
-    "orientation": 0
-   },
-   {
-    "id": "myid1003",
-    "type": "ActiveHinge",
-    "root": false,
-    "orientation": 1
-   },
-   {
-    "id": "myid1008",
-    "type": "ParametricJoint",
-    "root": false,
-    "evolvableParam": [
-     {
-      "paramValue": 0.080437041819095612
-     },
-     {
-      "paramValue": 1.4845567941665649
-     },
-     {
-      "paramValue": 0.0
-     }
-    ],
-    "orientation": 0
-   },
-   {
-    "id": "myid1005",
+    "id": "myid1001",
     "type": "ActiveHinge",
     "root": false,
     "orientation": 2
+   },
+   {
+    "id": "myid1008",
+    "type": "FixedBrick",
+    "root": false,
+    "orientation": 3
    },
    {
     "id": "myid1006",
@@ -55,10 +26,10 @@
     "root": false,
     "evolvableParam": [
      {
-      "paramValue": 0.057798001915216446
+      "paramValue": 0.080011546611785889
      },
      {
-      "paramValue": -65.315567016601562
+      "paramValue": 22.325397491455078
      },
      {
       "paramValue": 0.0
@@ -67,87 +38,104 @@
     "orientation": 0
    },
    {
-    "id": "myid1009",
+    "id": "myid1004",
     "type": "PassiveHinge",
     "root": false,
     "orientation": 0
    },
    {
     "id": "myid1007",
-    "type": "IrSensor",
+    "type": "ActiveHinge",
     "root": false,
+    "orientation": 1
+   },
+   {
+    "id": "myid1003",
+    "type": "ParametricJoint",
+    "root": false,
+    "evolvableParam": [
+     {
+      "paramValue": 0.053688608109951019
+     },
+     {
+      "paramValue": 30.897735595703125
+     },
+     {
+      "paramValue": 0.0
+     }
+    ],
     "orientation": 2
    },
    {
-    "id": "myid1001",
-    "type": "PassiveHinge",
+    "id": "myid1002",
+    "type": "LightSensor",
     "root": false,
-    "orientation": 0
+    "orientation": 3
+   },
+   {
+    "id": "myid1005",
+    "type": "ActiveHinge",
+    "root": false,
+    "orientation": 3
    },
    {
     "id": "myid1000",
-    "type": "PassiveHinge",
+    "type": "LightSensor",
     "root": false,
-    "orientation": 1
+    "orientation": 3
    }
   ],
   "connection": [
    {
     "src": "CoreComponent",
-    "dest": "myid1002",
-    "srcSlot": 2,
+    "dest": "myid1001",
+    "srcSlot": 0,
     "destSlot": 0
    },
    {
-    "src": "myid1002",
-    "dest": "myid1004",
-    "srcSlot": 1,
-    "destSlot": 0
-   },
-   {
-    "src": "myid1004",
-    "dest": "myid1003",
-    "srcSlot": 1,
-    "destSlot": 0
-   },
-   {
-    "src": "myid1003",
+    "src": "myid1001",
     "dest": "myid1008",
     "srcSlot": 1,
     "destSlot": 0
    },
    {
-    "src": "myid1004",
-    "dest": "myid1005",
-    "srcSlot": 3,
-    "destSlot": 0
-   },
-   {
-    "src": "myid1005",
+    "src": "myid1008",
     "dest": "myid1006",
     "srcSlot": 1,
     "destSlot": 0
    },
    {
     "src": "myid1006",
-    "dest": "myid1009",
+    "dest": "myid1004",
     "srcSlot": 1,
     "destSlot": 0
    },
    {
-    "src": "myid1009",
+    "src": "myid1004",
     "dest": "myid1007",
     "srcSlot": 1,
     "destSlot": 0
    },
    {
-    "src": "CoreComponent",
-    "dest": "myid1001",
-    "srcSlot": 3,
+    "src": "myid1007",
+    "dest": "myid1003",
+    "srcSlot": 1,
     "destSlot": 0
    },
    {
-    "src": "myid1001",
+    "src": "myid1003",
+    "dest": "myid1002",
+    "srcSlot": 1,
+    "destSlot": 0
+   },
+   {
+    "src": "CoreComponent",
+    "dest": "myid1005",
+    "srcSlot": 2,
+    "destSlot": 0
+   },
+   {
+    "src": "myid1005",
     "dest": "myid1000",
     "srcSlot": 1,
     "destSlot": 0
@@ -205,11 +193,27 @@
     "gain": 1.0
    },
    {
-    "id": "myid1003-0",
+    "id": "myid1000-0",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "myid1000",
+    "ioId": 0,
+    "gain": 1.0
+   },
+   {
+    "id": "myid1001-0",
     "layer": "output",
     "type": "sigmoid",
     "bias": 0.0,
-    "bodyPartId": "myid1003",
+    "bodyPartId": "myid1001",
+    "ioId": 0,
+    "gain": 1.0
+   },
+   {
+    "id": "myid1002-0",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "myid1002",
     "ioId": 0,
     "gain": 1.0
    },
@@ -224,8 +228,9 @@
    },
    {
     "id": "myid1007-0",
-    "layer": "input",
-    "type": "simple",
+    "layer": "output",
+    "type": "sigmoid",
+    "bias": 0.0,
     "bodyPartId": "myid1007",
     "ioId": 0,
     "gain": 1.0
@@ -234,7 +239,7 @@
   "connection": [
    {
     "src": "CoreComponent-0",
-    "dest": "myid1003-0",
+    "dest": "myid1001-0",
     "weight": 0.0
    },
    {
@@ -243,28 +248,43 @@
     "weight": 0.0
    },
    {
-    "src": "CoreComponent-1",
-    "dest": "myid1003-0",
+    "src": "CoreComponent-0",
+    "dest": "myid1007-0",
     "weight": 0.0
    },
    {
     "src": "CoreComponent-1",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-1",
+    "dest": "myid1005-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-1",
+    "dest": "myid1007-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-2",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-2",
     "dest": "myid1005-0",
     "weight": 0.0
    },
    {
     "src": "CoreComponent-2",
-    "dest": "myid1003-0",
-    "weight": 0.0
-   },
-   {
-    "src": "CoreComponent-2",
-    "dest": "myid1005-0",
+    "dest": "myid1007-0",
     "weight": 0.0
    },
    {
     "src": "CoreComponent-3",
-    "dest": "myid1003-0",
+    "dest": "myid1001-0",
     "weight": 0.0
    },
    {
@@ -273,53 +293,113 @@
     "weight": 0.0
    },
    {
-    "src": "CoreComponent-4",
-    "dest": "myid1003-0",
+    "src": "CoreComponent-3",
+    "dest": "myid1007-0",
     "weight": 0.0
    },
    {
     "src": "CoreComponent-4",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-4",
+    "dest": "myid1005-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-4",
+    "dest": "myid1007-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-5",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "CoreComponent-5",
     "dest": "myid1005-0",
     "weight": 0.0
    },
    {
     "src": "CoreComponent-5",
-    "dest": "myid1003-0",
+    "dest": "myid1007-0",
     "weight": 0.0
    },
    {
-    "src": "CoreComponent-5",
+    "src": "myid1000-0",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1000-0",
     "dest": "myid1005-0",
     "weight": 0.0
    },
    {
-    "src": "myid1003-0",
-    "dest": "myid1003-0",
+    "src": "myid1000-0",
+    "dest": "myid1007-0",
     "weight": 0.0
    },
    {
-    "src": "myid1003-0",
+    "src": "myid1001-0",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1001-0",
+    "dest": "myid1005-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1001-0",
+    "dest": "myid1007-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1002-0",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1002-0",
+    "dest": "myid1005-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1002-0",
+    "dest": "myid1007-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1005-0",
+    "dest": "myid1001-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1005-0",
     "dest": "myid1005-0",
     "weight": 0.0
    },
    {
     "src": "myid1005-0",
-    "dest": "myid1003-0",
-    "weight": 0.0
-   },
-   {
-    "src": "myid1005-0",
-    "dest": "myid1005-0",
+    "dest": "myid1007-0",
     "weight": 0.0
    },
    {
     "src": "myid1007-0",
-    "dest": "myid1003-0",
+    "dest": "myid1001-0",
     "weight": 0.0
    },
    {
     "src": "myid1007-0",
     "dest": "myid1005-0",
+    "weight": 0.0
+   },
+   {
+    "src": "myid1007-0",
+    "dest": "myid1007-0",
     "weight": 0.0
    }
   ]

@@ -196,32 +196,45 @@ export default {
     testSim: function () {
       var self = this
       if (this.saved) {
-        var file = self.simFilePath.substring(self.simFilePath.indexOf(this.mainFolderPath) + this.mainFolderPath.length + 1, self.simFilePath.length)
-        var robFile = self.robotFile.substring(self.robotFile.indexOf(this.mainFolderPath) + this.mainFolderPath.length + 1, self.robotFile.length)
-        console.log('Files:')
-        console.log(file)
-        console.log(robFile)
-        var ls = process.spawn('./scripts/sim/sim.sh', [robFile, file])
-
-        ls.stdout.on('data', function (data) {
-          console.log('stdout: <' + data + '> ')
-        })
-
-        ls.stderr.on('data', function (data) {
-          console.log('stderr: ' + data)
-        })
-
-        ls.on('close', function (code) {
-          console.log('child process exited with code ' + code)
-          // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
-          // getDroidOutput().style.background = 'DarkGray'
-        })
+        this.simulate(this.mainFolderPath, this.simFilePath, this.robotFile)
       } else {
         self.save_sim_file()
         if (self.saved) {
           self.testSim()
         }
       }
+    },
+    simulate (mainFolderPath, simFilePath, robotFile) {
+      if (!simFilePath.includes('examples') || !robotFile.includes('examples')) {
+        alert('Only the files in the example folder can used. Current filepath = ' + self.filepath)
+        return
+      }
+
+      var file = simFilePath.substring(
+        simFilePath.indexOf('examples') + 9,
+        simFilePath.length
+      )
+
+      var robFile = robotFile.substring(
+        robotFile.indexOf('examples') + 9,
+        robotFile.length
+      )
+
+      var ls = process.spawn('./scripts/sim/sim.sh', [robFile, file])
+
+      ls.stdout.on('data', function (data) {
+        console.log('stdout: <' + data + '> ')
+      })
+
+      ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data)
+      })
+
+      ls.on('close', function (code) {
+        console.log('child process exited with code ' + code)
+        // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
+        // getDroidOutput().style.background = 'DarkGray'
+      })
     },
     getFileName: function (filePath) {
       return filePath.substring(filePath.lastIndexOf('/') + 1)
@@ -280,6 +293,12 @@ export default {
   watch: {
     // saveCheck () {},
     update () {}
+  },
+  created () {
+    var self = this
+    Event.$on('visualize', function (vis) {
+      self.simulate(self.mainFolderPath, vis['simConfFile'], vis['robotfile'])
+    })
   }
 }
 </script>

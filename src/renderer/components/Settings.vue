@@ -122,9 +122,11 @@ export default {
       })
     },
     validate: function () {
+      // Validation may take longer than expected time
+      // Do not validate if evolution is in progress
       this.validateSim()
       this.validateEvol()
-      setTimeout(this.validate, 5000)
+      setTimeout(this.validate, 30000)
     },
     execute: function () {}
   },

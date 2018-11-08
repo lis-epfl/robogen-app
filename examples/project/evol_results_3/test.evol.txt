@@ -1,0 +1,22 @@
+simulatorConfFile=test.sim.txt
+evolutionMode = full
+numGenerations = 5
+mu = 5
+lambda = 5
+replacement = plus
+selection = deterministic-tournament
+tournamentSize = 2
+
+#Commonly used brain parameters
+pBrainMutate = 0.5
+pBrainCrossover = 0
+pAddHiddenNeuron = 0
+pOscillatorNeuron = 0
+
+#Commonly used body variation parameters
+numInitialParts = 2:10
+addBodyPart = All
+maxBodyParts = 20
+socket=172.17.0.3:49152
+brainBounds=-3:3
+brainSigma=.7
