@@ -8,12 +8,12 @@
       <div class="row">
         <div class="col-sm-6">
             <label class="label" for="robot">Robot File (Required)</label>
-            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :'robot.txt'}]" :defaultPath="projectFolderPath" ref="robotFile"></file-select>
+            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]" :defaultPath="projectFolderPath" ref="robotFile"></file-select>
             <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
         </div>
         <div class="col-sm-6">
             <label class="label" for="ff">Fitness Function (Required) </label>
-            <file-select v-model="scenarioFile" :accept="[{'name': 'Robogen Scenario File', 'ext' :'js'}]" :defaultPath="projectFolderPath" ref="scenarioFile"></file-select>
+            <file-select v-model="scenarioFile" :accept="[{'name': 'Robogen Scenario File', 'ext' :['js']}]" :defaultPath="projectFolderPath" ref="scenarioFile"></file-select>
         </div>
       </div>
       <div class="row">
@@ -44,10 +44,9 @@
           <textarea  name="textarea" id="textarea" v-model="other"></textarea>
           </div>
       </div>
+      <br>
 
-      
-
-      <div class="row">
+      <div class="row" style="display:none">
         <div class="debug-simulate">
             <pre><code>{{ simConfig }}</code></pre>
         </div>

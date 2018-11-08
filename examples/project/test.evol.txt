@@ -1,16 +1,16 @@
 simulatorConfFile=test.sim.txt
 evolutionMode = full
-numGenerations = 80
-mu = 40
+numGenerations = 5
+mu = 20
 lambda = 40
-replacement = plus
+replacement = comma
 selection = deterministic-tournament
 tournamentSize = 2
 
 #Commonly used brain parameters
 pBrainMutate = 0.5
 pBrainCrossover = 0
-pAddHiddenNeuron = 0
+pAddHiddenNeuron = 1
 pOscillatorNeuron = 0
 
 #Commonly used body variation parameters

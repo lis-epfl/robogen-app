@@ -65,6 +65,9 @@ export default {
       ls.stderr.on('data', function (data) {
         console.log('stderr: ' + data)
         self.evolStatus = false
+        if (data.includes('No such container: robogen')) {
+          self.activateEvol()
+        }
       })
 
       ls.on('close', function (code) {
@@ -126,7 +129,7 @@ export default {
       // Do not validate if evolution is in progress
       this.validateSim()
       this.validateEvol()
-      setTimeout(this.validate, 30000)
+      setTimeout(this.validate, 5000)
     },
     execute: function () {}
   },

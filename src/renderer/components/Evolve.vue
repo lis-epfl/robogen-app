@@ -8,13 +8,13 @@
       
       <div class="row">
         <div class="col-sm-6">
-            <label class="label" for="robot">Robot File (Optional for full evolution)</label>
-            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :'robot.txt'}]" :defaultPath="projectFolderPath" ref="robotFile"></file-select>
-            <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
+            <label class="label" for="ff">Simulation File (Required) </label>
+            <file-select v-model="simFile" :accept="[{'name': 'Robogen Simulation File', 'ext' :['sim.txt']}]" :defaultPath="projectFolderPath" ref="simFile"></file-select>
         </div>
         <div class="col-sm-6">
-            <label class="label" for="ff">Simulation File (Required) </label>
-            <file-select v-model="simFile" :accept="[{'name': 'Robogen Simulation File', 'ext' :'sim.txt'}]" :defaultPath="projectFolderPath" ref="simFile"></file-select>
+            <label class="label" for="robot">Robot File (Optional for full evolution)</label>
+            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt','json']}]" :defaultPath="projectFolderPath" :optional="true" ref="robotFile"></file-select>
+            <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
         </div>
       </div>
       <div class="row">
@@ -123,18 +123,6 @@
         </b-card-body>
       </b-collapse>
     </b-card>
-    <b-card no-body class="mb-1">
-      <b-card-header header-tag="header" class="p-1" role="tab" style="height:inherit">
-        <b-btn block href="#" v-b-toggle.accordion3 variant="light" style="text-align:left"> <font-awesome-icon icon="chevron-down" /> &nbsp; Output</b-btn>
-      </b-card-header>
-      <b-collapse id="accordion3" accordion="my-accordion" role="tabpanel">
-        <b-card-body>
-          <p class="card-text">
-            text
-          </p>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
   </div>
       </div>
 
@@ -145,9 +133,9 @@
           </div>
       </div>
 
-      
+      <br>
 
-      <div class="row">
+      <div class="row" style="display:none">
         
         <div class="debug-simulate">
           <div class="robotFileInEvolve"> {{referenceRobotFile}}</div>
@@ -158,7 +146,7 @@
       <div class="row">
         <input type="submit" value="Save" :disabled="!isValid" @click="save_evol_file">
         <div style="position:absolute; right:70px" >
-        <input type="button" value="Test Me" :disabled="!isValid" @click="testEvol" >
+        <input type="button" value="Evolve" :disabled="!isValid" @click="testEvol" >
         </div>
       </div>
     </fieldset>
@@ -263,10 +251,10 @@ export default {
         }
       })
       this.saved = true
-      if (this.robotFiles.length === 1) {
-        this.robotFile = this.projectFolderPath + '/' + this.robotFiles[0]
-        this.$refs.robotFile.updateFilePath(this.robotFile)
-      }
+      // if (this.robotFiles.length === 1) {
+      //   this.robotFile = this.projectFolderPath + '/' + this.robotFiles[0]
+      //   this.$refs.robotFile.updateFilePath(this.robotFile)
+      // }
     },
     updateData: function (param) {
       if (param.includes('simulatorConfFile=')) {
@@ -300,6 +288,9 @@ export default {
         this.addBodyPart = param.substring('addBodyPart='.length)
       } else if (param.includes('maxBodyParts=')) {
         this.maxBodyParts = param.substring('maxBodyParts='.length)
+      } else if (param.includes('referenceRobotFile=')) {
+        this.referenceRobotFile = param.substring('referenceRobotFile='.length)
+        this.$refs.robotFile.updateFilePath(this.referenceRobotFile)
       } else if (param.includes('socket=') || param.includes('brainBounds=') || param.includes('brainSigma=')) {
         // Do nothing
       } else {
@@ -353,7 +344,7 @@ export default {
 
         console.log(file)
         console.log(folder)
-        Event.$emit('newEvol')
+        Event.$emit('newEvol', this.numGenerations)
         var ls = process.spawn('./scripts/evol/evol.sh', [file, folder])
 
         ls.stdout.on('data', function (data) {
@@ -391,6 +382,7 @@ export default {
         this.referenceRobotFile = '#Evolution from scratch'
       } else {
         this.referenceRobotFile = 'referenceRobotFile=' + this.getFileName(this.robotFile) + '\n\n'
+        this.content += this.referenceRobotFile
       }
       this.content += 'simulatorConfFile=' + this.getFileName(this.simFile) + '\n'
       this.content += 'evolutionMode = ' + this.evolutionMode + '\n'
@@ -430,6 +422,7 @@ export default {
     },
     update: function () {
       if (this.evolFiles.length > 0) {
+        this.$refs.robotFile.updateFilePath('')
         this.load_evol_file(this.projectFolderPath + '/' + this.evolFiles[0])
         console.log(this.mainFolderPath)
       } else {

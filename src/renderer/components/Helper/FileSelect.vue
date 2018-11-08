@@ -1,11 +1,12 @@
 <template>
   <label class="file-select">
     <div class="select-button" style="display:inline-block">
-      <span v-if="defaultPath">Selected File</span>
-      <span v-else>Select File <br> <span class="select-extention">{{accept[0].ext}}</span></span>
+        <span v-if="filePath">Selected File</span>
+        <span v-else>Select File <br> <span class="select-extention">{{accept[0].ext}}</span></span>
     </div>
       <span style="display:inline-block">{{getFileName()}}</span>
       <input type="button" @click="get_file"/>
+      <span v-if="optional&&filePath" @click.prevent="removeFile">&nbsp;<font-awesome-icon icon="trash-alt" class="text-danger"/></span>
   </label>
 </template>
 
@@ -21,6 +22,10 @@ export default {
     },
     defaultPath: {
       type: String
+    },
+    optional: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -35,7 +40,7 @@ export default {
       dialog.showOpenDialog({
         defaultPath: this.defaultPath,
         filters: [
-          { name: this.accept[0].name, extensions: [this.accept[0].ext] }
+          { name: this.accept[0].name, extensions: this.accept[0].ext }
         ]
       }, (fileName) => {
         if (fileName === undefined) {
@@ -52,6 +57,10 @@ export default {
     },
     updateFilePath: function (filePath) {
       this.filePath = filePath
+    },
+    removeFile: function () {
+      this.filePath = ''
+      this.$emit('input', this.filePath)
     }
   }
 }

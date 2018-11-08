@@ -3,7 +3,6 @@
     <fieldset>
       <div class="row">
           <div class="col-sm-8" style="padding:0"> <legend style="border:0;margin:0">Evolution Results </legend></div>
-          <div class="col-sm-4" style="padding:0"><input type="button" value="Load File" ></div>
       </div>
       <!-- <p>Maximum number of parallel fitness evaluations threads: {{ cpuCount }}</p>
       <b-progress :max="maxCpuCount">
@@ -45,11 +44,68 @@
             <v-chart :options="options" :autoResize="true"/>
             </div>
             <hr>
+            <span class="text-center">Colour scale</span>
+              <b-progress :max="100">
+                <b-progress-bar v-for="n in 100" :key="n" :value="1" v-b-tooltip.hover :title="n" :style="{ backgroundColor: getColour(n,1,100)}" style="cursor: pointer;"><span style="width:100%;height:100%"></span></b-progress-bar>
+              </b-progress>
+              <hr>
+
             <b-table striped bordered outlined hover footClone :items="evolution" :fields="fields" >
               <template slot="individuals" slot-scope="data">
-                <b-progress :max="population" class="mb-2">
-                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="fitnessValue" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue)}"><span v-on:click="getVis(data.item.generation, index , fitnessValue)" style="width:100%;height:100%"></span></b-progress-bar>
+                <b-row>
+                  <b-col cols="12">
+                <b-progress :max="population" >
+                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue)" style="width:100%;height:100%"></span></b-progress-bar>
                 </b-progress>
+                  </b-col>
+                </b-row>
+              </template>
+              <template slot="row-details" slot-scope="data">
+                <b-card v-if="nnVis.generation == data.item.generation">
+                  <br>
+                  <b-row class="mb-2">
+                    <b-col class="text-center" style="font-size:25px;">Generation {{nnVis.generation}} (Individual {{nnVis.individual}})</b-col>
+                  </b-row>
+                  <b-row class="mb-2">
+                    <b-table bordered outlined small fixed :items="nnVis.items" :fields="nnVis.fields">
+                      <template slot="x" slot-scope="neuron">
+                        <div v-b-tooltip.hover :title="getTooltipForNNVisItem(neuron)">
+                           <span v-if="neuron.item.x.type==='sigmoid'">SIG</span>
+                           <span v-else-if="neuron.item.x.type==='simple'">IN</span>
+                           <span v-else-if="neuron.item.x.type==='oscillator'">OSC</span>
+                           <span v-else>{{neuron.item.x.type}}</span>
+                         </div>
+                      </template>
+                      <template v-for="(title,index) in nnVis.fields" :slot="getTitle(title)" slot-scope="neuron">
+                         <div v-b-tooltip.hover :title="getTooltipForNNVis(neuron)" :key="index">
+                           <span v-if="neuron.field.type==='sigmoid'">SIG</span>
+                           <span v-else-if="neuron.field.type==='simple'">IN</span>
+                           <span v-else-if="neuron.field.type==='oscillator'">OSC</span>
+                           <span v-else>{{neuron.field.type}}</span>
+                         </div>
+                      </template>
+
+                    </b-table>
+                  </b-row>
+                  <!-- <b-row class="mb-2">
+                    <b-col sm="3" class="text-sm-right"><b>Is Active:</b></b-col>
+                    <b-col>{{ row.item.isActive }}</b-col>
+                  </b-row> -->
+                  <!-- <b-button size="sm" @click="data.toggleDetails;">Hide Details</b-button> -->
+                </b-card>
+              </template>
+
+              <template slot="best" scope="data">
+                <span v-if="data.item.best<0"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-else>{{data.item.best}}</span>
+              </template>
+              <template slot="avg" scope="data">
+                <span v-if="data.item.avg<0"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-else>{{data.item.avg}}</span>
+              </template>
+              <template slot="std" scope="data">
+                <span v-if="data.item.std<0"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-else>{{data.item.std}}</span>
               </template>
             </b-table>
         </b-tab>
@@ -84,7 +140,8 @@ export default {
       selectedFolder: '',
       maxCpuCount: 1,
       cpuCount: 1,
-      evolution: [{'generation': '1', 'best': 0.000539646, 'avg': 0.000106292, 'std': 0.000146535, 'fitness': [2, 2, 3, 4]}],
+      evolution: [{'generation': '1', 'best': -1, 'avg': -1, 'std': -1, 'fitness': [2, 2, 3, 4]}, {'generation': '2', 'best': -1, 'avg': -1, 'std': -1, 'fitness': [2, 0, 3, 4]}],
+      maxGenerations: 0, // WIll be updated on new evol event
       // {"generation":"1","best":0.000539646,"avg":0.000106292,"std":0.000146535,"fitness":[1,2,3,4]}
       pastEvolution: [],
       // {'foldername': [{}, {}]}
@@ -216,14 +273,25 @@ export default {
           sortable: true
         },
         individuals: {
-          label: 'Individuals'
+          label: 'Individuals',
+          class: 'individuals'
         }
       },
+      nnVis: { 'generation': 0, 'individual': 0, 'items': [], 'fields': [] },
       colours: []
 
     }
   },
   methods: {
+    getTitle (title) {
+      return 'HEAD_' + title.label
+    },
+    getTooltipForNNVis (neuron) {
+      return 'ID = ' + neuron.field.key + '\nType =' + neuron.field.type + '\nLayer =' + neuron.field.layer
+    },
+    getTooltipForNNVisItem (neuron) {
+      return 'ID = ' + neuron.item.x.label + '\nType =' + neuron.item.x.type + '\nLayer =' + neuron.item.x.layer
+    },
     addCpu () {
       if (this.cpuCount < this.maxCpuCount) {
         this.cpuCount += 1
@@ -260,17 +328,17 @@ export default {
       // var std = generation['std']
       var fitnesses = gen['fitness']
 
-      // Best shoud be one of the indiduvial. Sometime console outputs 002525 instead of 0.002525
+      // Best shoud be one of the individuvial. Sometime console outputs 002525 instead of 0.002525
       if (Math.max.apply(null, fitnesses) !== best) {
         console.log('Best reset. Obtained=' + best + ' Actual=' + Math.max.apply(null, fitnesses))
         gen['best'] = Math.max.apply(null, fitnesses) // Reset the best
       }
       return gen
     },
-    getColour (fitness) {
-      var location = (fitness - this.minFitness) / (this.maxFintess - this.minFitness)
+    getColour (fitness, minFitness, maxFintess) {
+      var location = (fitness - minFitness) / (maxFintess - minFitness)
       location = parseInt(location * this.colours.length)
-      if (fitness === this.maxFintess) {
+      if (fitness === maxFintess) {
         return '#00FF00'
       }
       return this.colours[location]
@@ -283,19 +351,21 @@ export default {
       return tooltip + 'G' + generation + ' (I' + (index + 1) + ') : ' + fitnessValue
     },
     getVis (generation, index, fitnessValue) {
+      var individual = index + 1 // Update by one for individual
       var files = fs.readdirSync(this.projectFolderPath)
       var latest = 0
       for (var i = 0; i < files.length; i++) {
         if (files[i].includes('evol_results_')) {
-          console.log(files[i])
-          latest = parseInt(files[i].substring('evol_results_'.length))
+          if (parseInt(files[i].substring('evol_results_'.length)) > latest) {
+            latest = parseInt(files[i].substring('evol_results_'.length))
+          }
         }
       }
+      console.log(latest + 'is latest')
       var folder = this.projectFolderPath + '/evol_results'
       if (latest !== 0) {
         folder += '_' + latest
       }
-
       var simConfFile = folder
       files = fs.readdirSync(folder)
       for (i = 0; i < files.length; i++) {
@@ -306,10 +376,63 @@ export default {
       }
 
       var vis = {}
-      vis['robotfile'] = folder + '/GenerationBest-' + generation + '.json'
+      vis['robotfile'] = folder + '/Generation-' + generation + '-Guy-' + individual + '.json'
       vis['simConfFile'] = simConfFile
-      Event.$emit('visualize', vis)
-      console.log(vis)
+
+      fs.readFile(vis['robotfile'], 'utf-8', (err, data) => {
+        if (err) {
+          alert('An error ocurred reading the file :' + err.message)
+          return
+        }
+        var neuralNetwork = JSON.parse(data)
+        var tempFields = {}
+        var connection = {}
+        var allLabel = {} // Contains column id {'neuron id': temprory id}
+        var zeroArray = []
+        tempFields['x'] = {}
+        tempFields['x']['label'] = ''
+        for (var i = 0; i < neuralNetwork.brain.neuron.length; i++) {
+          tempFields[neuralNetwork.brain.neuron[i].id] = {}
+          tempFields[neuralNetwork.brain.neuron[i].id]['label'] = neuralNetwork.brain.neuron[i].id
+          tempFields[neuralNetwork.brain.neuron[i].id]['type'] = neuralNetwork.brain.neuron[i].type
+          tempFields[neuralNetwork.brain.neuron[i].id]['layer'] = neuralNetwork.brain.neuron[i].layer
+          allLabel[neuralNetwork.brain.neuron[i].id] = i
+          if (neuralNetwork.brain.neuron[i].layer !== 'input') {
+            connection[neuralNetwork.brain.neuron[i].id] = []
+          }
+          zeroArray.push(0)
+        }
+
+        // Initialize the connections with 0 matrix
+        for (var key in connection) {
+          connection[key] = zeroArray
+        }
+        if (neuralNetwork.brain.hasOwnProperty('connection')) {
+          // Update the connections with 0 matrix
+          for (i = 0; i < neuralNetwork.brain.connection.length; i++) {
+            var tempIndex = allLabel[neuralNetwork.brain.connection[i].src]
+            connection[neuralNetwork.brain.connection[i].dest][tempIndex] = neuralNetwork.brain.connection[i].weight.toFixed(2)
+          }
+        }
+
+        this.nnVis.fields = tempFields
+        this.nnVis.items = [] // Reset
+
+        for (key in connection) {
+          var connectionItem = {}
+          connectionItem['x'] = tempFields[key]
+          var j = 0
+          for (var key2 in allLabel) {
+            connectionItem[key2] = connection[key][j]
+            j++
+          }
+          this.nnVis.items.push(connectionItem)
+        }
+        this.nnVis['generation'] = generation
+        this.nnVis['individual'] = individual
+
+        Event.$emit('visualize', vis) // Visuvalize the robot
+      })
     },
     updateResult (msg) {
       this.message += msg
@@ -325,7 +448,6 @@ export default {
         this.message = this.message.replace('.', '') // Remove dots from the message
       }
       while (this.message.includes('mainEvolutionLoop')) {
-        console.log('In while loop. messgee =' + this.message)
         this.progress = 0
         // Parse the data
         index = this.message.indexOf('mainEvolutionLoop') + 'mainEvolutionLoop \nGeneration '.length - 1
@@ -364,9 +486,15 @@ export default {
           generation['std'] = parseFloat(stdev)
           generation['fitness'] = fitness.map(Number)
           generation = this.validate(generation)
-          this.evolution.push(generation)
-          this.message = this.message.substring(end) // Erase the part above
+          generation['_showDetails'] = true
 
+          this.message = this.message.substring(end) // Erase the part above
+          var loading = this.evolution.pop()
+          this.evolution.push(generation)
+          if (parseInt(generationCount) < this.maxGenerations) {
+            loading['generation'] = parseInt(generationCount) + 1
+            this.evolution.push(loading)
+          }
           this.options.xAxis.data.push(generation['generation'])
           this.options.series[0].data.push(generation['best'])
           this.options.series[1].data.push(generation['avg'])
@@ -374,12 +502,11 @@ export default {
           if (low < 0) { low = 0 }
           this.options.series[2].data.push(low)
           this.options.series[3].data.push(parseFloat(generation['std']))
-          console.log(this.evolution)
         }
       }
-      if (this.message !== '') {
-        console.log('Remaining message = ' + this.message)
-      }
+      // if (this.message !== '') {
+      //   console.log('Remaining message = ' + this.message)
+      // }
     },
     loadResults (projectFolderPath, resultFolder) {
       // Load BestAvgStd.txt
@@ -425,7 +552,11 @@ export default {
           }
         }
       })
+    },
+    loadVis (generation, individual) {
+      console.log('loading g' + generation + 'individual ' + individual)
     }
+
   },
   computed: {
     update () {
@@ -452,10 +583,12 @@ export default {
       self.updateResult(new TextDecoder('utf-8').decode(msg))
     })
 
-    Event.$on('newEvol', function (msg) {
+    Event.$on('newEvol', function (_maxGenerations) {
+      self.maxGenerations = parseInt(_maxGenerations)
       console.log('New Evolution')
+      self.tabIndex = 1
       self.ongoingEvolution = true
-      self.evolution = []
+      self.evolution = [{'generation': 1, 'best': -1, 'avg': -1, 'std': -1, 'fitness': []}]
       self.population = 0
       self.maxFintess = 0
       self.minFitness = 100000000 // Unreasonably high value
@@ -478,5 +611,14 @@ export default {
 .echarts {
     width: 100%!important;
     height: 350px!important; /* or e.g. 400px */
+}
+.individuals{
+  width: 50%;
+}
+.expand-button {
+  padding: 0.1rem 0.5rem 0rem 0.5rem;
+}
+td[colspan="5"] {
+ padding:0
 }
 </style>

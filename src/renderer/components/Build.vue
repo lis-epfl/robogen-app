@@ -239,8 +239,11 @@ export default {
     testRobot: function () {
       var self = this
       if (this.saved) {
-        var file = self.filepath.substring(self.filepath.indexOf(this.mainFolderPath) + this.mainFolderPath.length, self.filepath.length)
-        var ls = process.spawn('./scripts/sim/sim.sh', [file, 'conf.txt'])
+        var robFile = self.filepath.substring(
+          self.filepath.indexOf('examples') + 9,
+          self.filepath.length
+        )
+        var ls = process.spawn('./scripts/sim/sim.sh', [robFile, 'conf.txt'])
 
         ls.stdout.on('data', function (data) {
           console.log('stdout: <' + data + '> ')
