@@ -3,23 +3,39 @@
     <fieldset>
       <div class="row">
           <div class="col-sm-8" style="padding:0"> <legend>Evolver Configuration <legend style="font-size:16px">{{name}}.evol.txt <span v-if="!saved" style="cursor:pointer; text-decoration:underline; color:blue" @click="save_evol_file">Save</span></legend></legend></div>
-          <div class="col-sm-4" style="padding:0"><input type="button" value="Load File" @click="open_file"></div>
+          <div class="col-sm-4" style="padding:0">
+          Evolution Settings: 
+          <b-form-select v-model="selectedEvolFile" class="mb-3">
+            <option :value="null" disabled>-- Please select an Evolution Settings --</option>
+            <option v-for="evolFile in evolFiles" :key="evolFile" :title="evolFile" :value="evolFile">{{evolFile}}</option>
+          </b-form-select>
+          </div>
       </div>
       
       <div class="row">
         <div class="col-sm-6">
+          <div class="row">
             <label class="label" for="ff">Simulation File (Required) </label>
+          </div>
+          <div class="row">
             <file-select v-model="simFile" :accept="[{'name': 'Robogen Simulation File', 'ext' :['sim.txt']}]" :defaultPath="projectFolderPath" ref="simFile"></file-select>
+          </div>
         </div>
         <div class="col-sm-6">
+          <div class="row">
             <label class="label" for="robot">Robot File (Optional for full evolution)</label>
+          </div>
+          <div class="row">
             <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt','json']}]" :defaultPath="projectFolderPath" :optional="true" ref="robotFile"></file-select>
+          </div>
             <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
         </div>
       </div>
       <div class="row">
         <div class="col-sm-3">
+          <div class="row">
           <label class="label" for="vue-form-list">Evolution Mode </label>
+          </div>
           <ul class="vue-form-list">
             <li>
               
@@ -48,7 +64,9 @@
 
       <div class="row">
         <div class="col-sm-3">
+          <div class="row">
           <label class="label" for="vue-form-list">Replacement</label>
+          </div>
           <ul class="vue-form-list">
             <li>
               
@@ -144,9 +162,8 @@
       </div>
 
       <div class="row">
-        <input type="submit" value="Save" :disabled="!isValid" @click="save_evol_file">
-        <div style="position:absolute; right:70px" >
-        <input type="button" value="Evolve" :disabled="!isValid" @click="testEvol" >
+        <div style="width:100%" >
+          <input type="button" value="Evolve" :disabled="!isValid" @click="testEvol" >
         </div>
       </div>
     </fieldset>
@@ -204,6 +221,7 @@ export default {
       filepath: '',
       cpuCount: 1,
       referenceRobotFile: '',
+      selectedEvolFile: '',
       localProjectFolderPath: this.projectFolderPath,
       localSimFiles: this.simFiles,
       localEvolFiles: this.evolFiles,
@@ -243,8 +261,9 @@ export default {
             // Remove all comments
             param = param.substring(0, param.indexOf('#'))
           }
-          // Remove all spaces
+          // Remove all spaces and \r if old mac file
           param = param.split(' ').join('')
+          param = param.split('\r').join('')
           if (param.length > 0) {
             this.updateData(param)
           }
@@ -291,6 +310,7 @@ export default {
       } else if (param.includes('referenceRobotFile=')) {
         this.referenceRobotFile = param.substring('referenceRobotFile='.length)
         this.$refs.robotFile.updateFilePath(this.referenceRobotFile)
+        this.robotFile = this.referenceRobotFile
       } else if (param.includes('socket=') || param.includes('brainBounds=') || param.includes('brainSigma=')) {
         // Do nothing
       } else {
@@ -342,8 +362,6 @@ export default {
           file.lastIndexOf('/')
         )
 
-        console.log(file)
-        console.log(folder)
         Event.$emit('newEvol', this.numGenerations)
         var ls = process.spawn('./scripts/evol/evol.sh', [file, folder])
 
@@ -354,11 +372,13 @@ export default {
 
         ls.stderr.on('data', function (data) {
           console.log('stderr: ' + data)
+          Event.$emit('endEvol', -1)
           alert(data)
         })
 
         ls.on('close', function (code) {
           console.log('child process exited with code ' + code)
+          Event.$emit('endEvol', code)
           // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
           // getDroidOutput().style.background = 'DarkGray'
         })
@@ -401,7 +421,7 @@ export default {
       this.content += 'numInitialParts = ' + this.numInitialParts + '\n'
       this.content += 'addBodyPart = ' + this.addBodyPart + '\n'
       this.content += 'maxBodyParts = ' + this.maxBodyParts + '\n'
-      this.content += 'socket=172.17.0.3:49152\nbrainBounds=-3:3\nbrainSigma=.7\n'
+      this.content += 'socket=127.0.0.1:49152\nbrainBounds=-3:3\nbrainSigma=.7\n'
 
       if (this.other !== '') {
         this.content += '\n#Other parameters\n'
@@ -424,6 +444,7 @@ export default {
       if (this.evolFiles.length > 0) {
         this.$refs.robotFile.updateFilePath('')
         this.load_evol_file(this.projectFolderPath + '/' + this.evolFiles[0])
+        this.selectedEvolFile = this.evolFiles[0]
         console.log(this.mainFolderPath)
       } else {
         this.$data = {
@@ -462,6 +483,9 @@ export default {
   },
   watch: {
     // saveCheck () {},
+    selectedEvolFile: function () {
+      this.load_evol_file(this.projectFolderPath + '/' + this.selectedEvolFile)
+    },
     update () {}
   }
 }

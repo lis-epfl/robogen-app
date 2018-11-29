@@ -412,6 +412,7 @@ header h1 {
 }
 .vue-form .label {
   display: block;
+  float: left;
 }
 .vue-form input,
 .vue-form textarea,

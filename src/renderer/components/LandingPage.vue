@@ -11,8 +11,8 @@
           <div style="margin-top:20px;">
             <a class="home-button" @click="show('home')"><font-awesome-icon icon="home" class="home-icon" /></a>
             <a href="#" class="action-button shadow animate blue main-body" @click="show('build')">Build a robot</a> 
-            <a href="#" class="action-button shadow animate yellow main-body" @click="show('simulate')">Simulate a robot</a>
-            <a href="#" class="action-button shadow animate red main-body" @click="show('evolve')">Evolve a robot</a>
+            <a href="#" class="action-button shadow animate yellow main-body" @click="show('simulate')">Simulation Settings</a>
+            <a href="#" class="action-button shadow animate red main-body" @click="show('evolve')">Evolution Settings</a>
             <a href="#" class="action-button shadow animate green main-body" @click="show('results')">Evolution Results</a>
           </div>
         </div>
@@ -143,7 +143,7 @@ main {
   float: left;
   border-radius: 10px;
   font-size: 20px;
-  width: 260px;
+  width: 215px;
   color: #fff;
   text-decoration: none;
   text-align: center;

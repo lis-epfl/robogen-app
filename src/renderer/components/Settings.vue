@@ -66,6 +66,7 @@ export default {
         console.log('stderr: ' + data)
         self.evolStatus = false
         if (data.includes('No such container: robogen')) {
+          console.log('Restart Evolve')
           self.activateEvol()
         }
       })

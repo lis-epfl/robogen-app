@@ -3,28 +3,50 @@
     <fieldset>
       <div class="row">
           <div class="col-sm-8" style="padding:0"> <legend style="border:0;margin:0">Simulation Configuration <legend style="font-size:16px">{{name}}.sim.txt <span v-if="!saved" style="cursor:pointer; text-decoration:underline; color:blue" @click="save_sim_file">Save</span></legend></legend></div>
-          <div class="col-sm-4" style="padding:0"><input type="button" value="Load File" @click="open_file"></div>
+          <div class="col-sm-4" style="padding:0">
+          Simulation Configuration: 
+          <b-form-select v-model="selectedSimFile" class="mb-3">
+            <option :value="null" disabled>-- Please select an Simulation Settings --</option>
+            <option v-for="simFile in simFiles" :key="simFile" :title="simFile" :value="simFile">{{simFile}}</option>
+          </b-form-select>
+          </div>
+          
       </div>
       <div class="row">
         <div class="col-sm-6">
+          <div class="row">
             <label class="label" for="robot">Robot File (Required)</label>
-            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]" :defaultPath="projectFolderPath" ref="robotFile"></file-select>
+          </div>
+            <div class="row">
+              <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]" :defaultPath="projectFolderPath" ref="robotFile"></file-select>
+            </div>
             <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
         </div>
         <div class="col-sm-6">
+          <div class="row">
             <label class="label" for="ff">Fitness Function (Required) </label>
+          </div>
+          <div class="row">
             <file-select v-model="scenarioFile" :accept="[{'name': 'Robogen Scenario File', 'ext' :['js']}]" :defaultPath="projectFolderPath" ref="scenarioFile"></file-select>
+          </div>
         </div>
       </div>
       <div class="row">
-              <div class="col-sm-6">
-                  <label class="label" for="st">Simulation Time (s) </label>
-                  <input type="number" name="st" id="st" required="" v-model="simulationTime">
-              </div>
-              <div class="col-sm-6">
-                  <label class="label" for="ff">Time Step</label>
-                  <input type="number" name="ff" id="ff" required="" v-model="timeStep">   
-              </div>
+        <div class="col-sm-6">
+            <label class="label" for="timeStep" id="timeStep">Time Step (Required) </label>
+            <b-tooltip target="timeStep" placement="topright">
+              Time step of the simulation in seconds. The smaller it is, the less error prone the simulation, but the longer it takes to simulate the same amount of time.
+            </b-tooltip>
+            <input type="number" name="timeStep"  required="" v-model="timeStep">
+        </div>
+
+        <div class="col-sm-6">
+            <label class="label" for="st" id="st">Simulation Time (s) </label>
+            <b-tooltip target="st" placement="topright">
+              Total length of simulation in seconds. Must be a multiple of timeStep. <strong>One of nTimeSteps or simulationTime must be specified.</strong>
+            </b-tooltip>
+            <input type="number" name="st"  required="" v-model="simulationTime">
+        </div>
       </div>
 
       <div class="row">
@@ -53,9 +75,8 @@
       </div>
 
       <div class="row">
-        <input type="submit" value="Save" :disabled="!isValid" @click="save_sim_file">
-        <div style="position:absolute; right:70px" >
-        <input type="button" value="Test Me" :disabled="!isValid" @click="testSim" >
+        <div style="width:100%" >
+        <input type="button" value="Test Simulation Settings" :disabled="!isValid" @click="testSim" >
         </div>
       </div>
     </fieldset>
@@ -89,6 +110,7 @@ export default {
     return {
       simulationTime: 8,
       timeStep: 0.005,
+      nTimeStep: '',
       terrainFriction: 1.0,
       gravity: 9.8,
       actuationFrequency: 25,
@@ -99,6 +121,7 @@ export default {
       content: '',
       saved: false,
       name: '',
+      selectedSimFile: '',
       localProjectFolderPath: this.projectFolderPath,
       localSimFiles: this.simFiles,
       localRobotFiles: this.robotFiles,
@@ -267,6 +290,7 @@ export default {
     update: function () {
       if (this.simFiles.length > 0) {
         this.load_sim_file(this.projectFolderPath + '/' + this.simFiles[0])
+        this.selectedSimFile = this.simFiles[0]
         console.log(this.mainFolderPath)
       } else {
         this.$data = {
@@ -290,6 +314,10 @@ export default {
     }
   },
   watch: {
+    selectedSimFile: function () {
+      console.log('Loading' + this.selectedSimFile)
+      this.load_sim_file(this.projectFolderPath + '/' + this.selectedSimFile)
+    },
     // saveCheck () {},
     update () {}
   },
@@ -322,5 +350,9 @@ export default {
   font-weight: 300;
   white-space: pre-wrap;
   tab-size: 2;
+}
+
+.tooltip-inner {
+    max-width: 400px;
 }
 </style>

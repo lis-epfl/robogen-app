@@ -28,34 +28,12 @@
               <v-chart :options="pastGraphOptions" :autoResize="true"/>
             </div>
             <hr>
-            <b-table striped bordered outlined hover footClone :items="pastEvolution" :fields="fields">
-              <template slot="individuals" slot-scope="data" >
-                TBD
-                <!-- <b-progress :max="population" class="mb-2">
-                  <b-progress-bar v-for="fitnessValue in data.item.fitness" :key="fitnessValue" :value="1" :style="{ backgroundColor: getColour(fitnessValue)}"></b-progress-bar>
-                </b-progress> -->
-              </template>
-            </b-table>
-        </b-tab>
-
-        <b-tab title="Ongoing Evolution" key="Ongoing Evolution">
-            <br>
-            <div style="width:100%">
-            <v-chart :options="options" :autoResize="true"/>
-            </div>
-            <hr>
-            <span class="text-center">Colour scale</span>
-              <b-progress :max="100">
-                <b-progress-bar v-for="n in 100" :key="n" :value="1" v-b-tooltip.hover :title="n" :style="{ backgroundColor: getColour(n,1,100)}" style="cursor: pointer;"><span style="width:100%;height:100%"></span></b-progress-bar>
-              </b-progress>
-              <hr>
-
-            <b-table striped bordered outlined hover footClone :items="evolution" :fields="fields" >
+            <b-table striped bordered outlined hover footClone :items="pastEvolution" :fields="fields" >
               <template slot="individuals" slot-scope="data">
                 <b-row>
                   <b-col cols="12">
-                <b-progress :max="population" >
-                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue)" style="width:100%;height:100%"></span></b-progress-bar>
+                <b-progress :max="pastPopulation" >
+                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess , data.item.fitness, true)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue)" style="width:100%;height:100%"></span></b-progress-bar>
                 </b-progress>
                   </b-col>
                 </b-row>
@@ -96,15 +74,87 @@
               </template>
 
               <template slot="best" scope="data">
-                <span v-if="data.item.best<0"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-if="data.item.best == -1000000"><font-awesome-icon icon="spinner" spin/></span>
                 <span v-else>{{data.item.best}}</span>
               </template>
               <template slot="avg" scope="data">
-                <span v-if="data.item.avg<0"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-if="data.item.avg == -1000000"><font-awesome-icon icon="spinner" spin/></span>
                 <span v-else>{{data.item.avg}}</span>
               </template>
               <template slot="std" scope="data">
-                <span v-if="data.item.std<0"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-if="data.item.std == -1000000"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-else>{{data.item.std}}</span>
+              </template>
+            </b-table>
+        </b-tab>
+
+        <b-tab title="Ongoing Evolution" key="Ongoing Evolution" disabled="!ongoingEvolution" >
+            <br>
+            <div style="width:100%">
+            <v-chart :options="options" :autoResize="true"/>
+            </div>
+            <hr>
+            <span class="text-center">Performance scale</span>
+              <b-progress :max="100">
+                <b-progress-bar v-for="n in 100" :key="n" :value="1" v-b-tooltip.hover :title="n" :style="{ backgroundColor: getColour(n,1,100,[],false)}" style="cursor: pointer;"><span style="width:100%;height:100%"></span></b-progress-bar>
+              </b-progress>
+              <hr>
+
+            <b-table striped bordered outlined hover footClone :items="evolution" :fields="fields" >
+              <template slot="individuals" slot-scope="data">
+                <b-row>
+                  <b-col cols="12">
+                <b-progress :max="population" >
+                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess , data.item.fitness, true)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue)" style="width:100%;height:100%"></span></b-progress-bar>
+                </b-progress>
+                  </b-col>
+                </b-row>
+              </template>
+              <template slot="row-details" slot-scope="data">
+                <b-card v-if="nnVis.generation == data.item.generation">
+                  <br>
+                  <b-row class="mb-2">
+                    <b-col class="text-center" style="font-size:25px;">Generation {{nnVis.generation}} (Individual {{nnVis.individual}})</b-col>
+                  </b-row>
+                  <b-row class="mb-2">
+                    <b-table bordered outlined small fixed :items="nnVis.items" :fields="nnVis.fields">
+                      <template slot="x" slot-scope="neuron">
+                        <div v-b-tooltip.hover :title="getTooltipForNNVisItem(neuron)">
+                           <span v-if="neuron.item.x.type==='sigmoid'">SIG</span>
+                           <span v-else-if="neuron.item.x.type==='simple'">IN</span>
+                           <span v-else-if="neuron.item.x.type==='oscillator'">OSC</span>
+                           <span v-else>{{neuron.item.x.type}}</span>
+                         </div>
+                      </template>
+                      <template v-for="(title,index) in nnVis.fields" :slot="getTitle(title)" slot-scope="neuron">
+                         <div v-b-tooltip.hover :title="getTooltipForNNVis(neuron)" :key="index">
+                           <span v-if="neuron.field.type==='sigmoid'">SIG</span>
+                           <span v-else-if="neuron.field.type==='simple'">IN</span>
+                           <span v-else-if="neuron.field.type==='oscillator'">OSC</span>
+                           <span v-else>{{neuron.field.type}}</span>
+                         </div>
+                      </template>
+
+                    </b-table>
+                  </b-row>
+                  <!-- <b-row class="mb-2">
+                    <b-col sm="3" class="text-sm-right"><b>Is Active:</b></b-col>
+                    <b-col>{{ row.item.isActive }}</b-col>
+                  </b-row> -->
+                  <!-- <b-button size="sm" @click="data.toggleDetails;">Hide Details</b-button> -->
+                </b-card>
+              </template>
+
+              <template slot="best" scope="data">
+                <span v-if="data.item.best == -1000000"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-else>{{data.item.best}}</span>
+              </template>
+              <template slot="avg" scope="data">
+                <span v-if="data.item.avg == -1000000"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-else>{{data.item.avg}}</span>
+              </template>
+              <template slot="std" scope="data">
+                <span v-if="data.item.std == -1000000"><font-awesome-icon icon="spinner" spin/></span>
                 <span v-else>{{data.item.std}}</span>
               </template>
             </b-table>
@@ -140,7 +190,8 @@ export default {
       selectedFolder: '',
       maxCpuCount: 1,
       cpuCount: 1,
-      evolution: [{'generation': '1', 'best': -1, 'avg': -1, 'std': -1, 'fitness': [2, 2, 3, 4]}, {'generation': '2', 'best': -1, 'avg': -1, 'std': -1, 'fitness': [2, 0, 3, 4]}],
+      progress: 0,
+      evolution: [{'generation': '1', 'best': -1000000, 'avg': -1000000, 'std': -1000000, 'fitness': [2, 2, 3, 4]}, {'generation': '2', 'best': -1000000, 'avg': -1000000, 'std': -1000000, 'fitness': [2, 0, 3, 4]}],
       maxGenerations: 0, // WIll be updated on new evol event
       // {"generation":"1","best":0.000539646,"avg":0.000106292,"std":0.000146535,"fitness":[1,2,3,4]}
       pastEvolution: [],
@@ -148,6 +199,7 @@ export default {
       maxFintess: 0,
       minFitness: 100000000, // Unreasonably high value
       population: 0,
+      pastPopulation: 0,
       message: '',
       ongoingEvolution: false,
       tabIndex: 0,
@@ -162,7 +214,6 @@ export default {
         toolbox: {
           show: true,
           feature: {
-            magicType: {show: true, type: ['tiled']},
             saveAsImage: {show: true}
           }
         },
@@ -174,18 +225,19 @@ export default {
           name: 'Generation',
           nameLocation: 'Center',
           nameTextStyle: {
-            padding: [60, 0, 0, 0]
+            padding: [60, 0, 0, 0],
+            fontSize: 18
           },
           data: [],
-          nameGap: 35,
-          min: 0
+          nameGap: 35
         },
         yAxis: {
           type: 'value',
           name: 'Fitness Value',
           nameLocation: 'Center',
           nameTextStyle: {
-            padding: [0, 0, 100, 0]
+            padding: [0, 0, 100, -50],
+            fontSize: 18
           },
           min: 0,
           nameRotate: 90,
@@ -195,7 +247,7 @@ export default {
           trigger: 'axis',
           axisPointer: {
             type: 'cross',
-            animation: false,
+            animation: true,
             label: {
               backgroundColor: '#ccc',
               borderColor: '#aaa',
@@ -217,13 +269,13 @@ export default {
             name: 'Best',
             data: [],
             type: 'line',
-            smooth: true
+            smooth: false
           },
           {
             name: 'Average',
             data: [],
             type: 'line',
-            smooth: true
+            smooth: false
           },
           {
             type: 'line',
@@ -273,7 +325,7 @@ export default {
           sortable: true
         },
         individuals: {
-          label: 'Individuals',
+          label: 'Performance Distribution within population',
           class: 'individuals'
         }
       },
@@ -324,8 +376,8 @@ export default {
     },
     validate (gen) {
       var best = gen['best']
-      // var average = generation['avg']
-      // var std = generation['std']
+      var average = gen['avg']
+      // var std = gen['std']
       var fitnesses = gen['fitness']
 
       // Best shoud be one of the individuvial. Sometime console outputs 002525 instead of 0.002525
@@ -333,25 +385,42 @@ export default {
         console.log('Best reset. Obtained=' + best + ' Actual=' + Math.max.apply(null, fitnesses))
         gen['best'] = Math.max.apply(null, fitnesses) // Reset the best
       }
+
+      const averageFunc = arr => arr.reduce((p, c) => p + c, 0) / arr.length
+      var calculatedMean = averageFunc(fitnesses)
+      if (Math.abs(calculatedMean - average) > 0.1) {
+        console.log('Mean reset. Obtained=' + average + ' Actual=' + averageFunc(fitnesses))
+        gen['avg'] = averageFunc(fitnesses) // Reset the best
+      }
+
       return gen
     },
-    getColour (fitness, minFitness, maxFintess) {
-      var location = (fitness - minFitness) / (maxFintess - minFitness)
+    getColour (fitness, minFitness, maxFitness, fitnesses, local) {
+      // local - locally colour scale fitness value
+      if (local) {
+        // minFitness and maxFitness are the global maxima and minima
+        maxFitness = Math.max.apply(null, fitnesses)
+        minFitness = Math.min.apply(null, fitnesses)
+      }
+
+      var location = (fitness - minFitness) / (maxFitness - minFitness)
       location = parseInt(location * this.colours.length)
-      if (fitness === maxFintess) {
-        return '#00FF00'
+      // if (fitness === maxFitness) {
+      //   return '#00FF00'
+      // }
+      if (location !== 0) {
+        location--
       }
       return this.colours[location]
     },
     getTooltip (generation, index, fitnessValue) {
       var tooltip = ''
-      if (fitnessValue === this.maxFintess) {
-        tooltip += 'Best Individual \n'
+      if (fitnessValue === this.maxFitness) {
+        tooltip += 'Evolution\'s Best \n'
       }
       return tooltip + 'G' + generation + ' (I' + (index + 1) + ') : ' + fitnessValue
     },
-    getVis (generation, index, fitnessValue) {
-      var individual = index + 1 // Update by one for individual
+    getOnGoingEvolFolder () {
       var files = fs.readdirSync(this.projectFolderPath)
       var latest = 0
       for (var i = 0; i < files.length; i++) {
@@ -366,9 +435,15 @@ export default {
       if (latest !== 0) {
         folder += '_' + latest
       }
+      return folder
+    },
+    getVis (generation, index, fitnessValue) {
+      var individual = index + 1 // Update by one for individual
+      var folder = this.getOnGoingEvolFolder()
+      // Get Sim Conf File from the folder
       var simConfFile = folder
-      files = fs.readdirSync(folder)
-      for (i = 0; i < files.length; i++) {
+      var files = fs.readdirSync(folder)
+      for (var i = 0; i < files.length; i++) {
         if (files[i].includes('.sim.txt')) {
           simConfFile += '/' + files[i]
           break
@@ -376,7 +451,8 @@ export default {
       }
 
       var vis = {}
-      vis['robotfile'] = folder + '/Generation-' + generation + '-Guy-' + individual + '.json'
+      // vis['robotfile'] = folder + '/Generation-' + generation + '-Guy-' + individual + '.json'
+      vis['robotfile'] = folder + '/GenerationBest-' + generation + '.json'
       vis['simConfFile'] = simConfFile
 
       fs.readFile(vis['robotfile'], 'utf-8', (err, data) => {
@@ -445,6 +521,7 @@ export default {
             this.population = parseInt(tempPop)
           }
         }
+        this.progress += this.message.split('.').length
         this.message = this.message.replace('.', '') // Remove dots from the message
       }
       while (this.message.includes('mainEvolutionLoop')) {
@@ -499,7 +576,6 @@ export default {
           this.options.series[0].data.push(generation['best'])
           this.options.series[1].data.push(generation['avg'])
           var low = parseFloat(generation['avg']) - parseFloat(generation['std']) / 2
-          if (low < 0) { low = 0 }
           this.options.series[2].data.push(low)
           this.options.series[3].data.push(parseFloat(generation['std']))
         }
@@ -508,7 +584,9 @@ export default {
       //   console.log('Remaining message = ' + this.message)
       // }
     },
-    loadResults (projectFolderPath, resultFolder) {
+    loadResultsTreditionally (projectFolderPath, resultFolder) {
+      console.log('Reupdating past evolution')
+      // This will be executed on error
       // Load BestAvgStd.txt
       var fileName = projectFolderPath + '/' + resultFolder + '/BestAvgStd.txt'
       fs.readFile(fileName, 'utf-8', (err, data) => {
@@ -520,6 +598,9 @@ export default {
         // Initialize
         this.pastEvolution = [] // Data for table
         this.pastGraphOptions = JSON.parse(JSON.stringify(this.options)) // Make a copy of options for graph
+        this.pastGraphOptions.tooltip.formatter = function (params) {
+          return 'Generation ' + params[0].axisValue + '<br>Best Fitness = ' + params[0].value + '<br>Average Fitness = ' + params[1].value + '<br>STD = ' + params[3].value
+        }
         // Reset data
         this.pastGraphOptions.xAxis.data = []
         this.pastGraphOptions.series[0].data = []
@@ -546,9 +627,47 @@ export default {
             this.pastGraphOptions.series[0].data.push(parseFloat(best))
             this.pastGraphOptions.series[1].data.push(parseFloat(average))
             var low = parseFloat(average) - parseFloat(stdev) / 2
-            if (low < 0) { low = 0 }
             this.pastGraphOptions.series[2].data.push(low)
             this.pastGraphOptions.series[3].data.push(parseFloat(stdev))
+          }
+        }
+      })
+    },
+    loadResults (projectFolderPath, resultFolder) {
+      console.log('Load Results')
+      // Check for Evolution.json
+      var fileName = projectFolderPath + '/' + resultFolder + '/evolution.json'
+      fs.readFile(fileName, 'utf-8', (err, data) => {
+        if (err) {
+          alert('An error ocurred reading the file :' + err.message)
+          this.loadResultsTreditionally(projectFolderPath, resultFolder)
+        }
+
+        this.pastEvolution = JSON.parse(data)
+        this.pastPopulation = 0
+        // Update graph
+        this.pastGraphOptions = JSON.parse(JSON.stringify(this.options)) // Make a copy of options for graph
+        this.pastGraphOptions.tooltip.formatter = function (params) {
+          return 'Generation ' + params[0].axisValue + '<br>Best Fitness = ' + params[0].value + '<br>Average Fitness = ' + params[1].value + '<br>STD = ' + params[3].value
+        }
+        // Reset data
+        this.pastGraphOptions.xAxis.data = []
+        this.pastGraphOptions.series[0].data = []
+        this.pastGraphOptions.series[1].data = []
+        this.pastGraphOptions.series[2].data = []
+        this.pastGraphOptions.series[3].data = []
+
+        // Loop and populate
+        for (var i = 0; i < this.pastEvolution.length; i++) {
+          // Populate data
+          this.pastGraphOptions.xAxis.data.push(this.pastEvolution[i].generation)
+          this.pastGraphOptions.series[0].data.push(this.pastEvolution[i].best)
+          this.pastGraphOptions.series[1].data.push(this.pastEvolution[i].avg)
+          var low = this.pastEvolution[i].avg - this.pastEvolution[i].std / 2
+          this.pastGraphOptions.series[2].data.push(low)
+          this.pastGraphOptions.series[3].data.push(parseFloat(this.pastEvolution[i].std))
+          if (this.pastPopulation < this.pastEvolution[i].fitness.length) {
+            this.pastPopulation = this.pastEvolution[i].fitness.length
           }
         }
       })
@@ -583,16 +702,28 @@ export default {
       self.updateResult(new TextDecoder('utf-8').decode(msg))
     })
 
+    Event.$on('endEvol', function (code) {
+      if (code !== 0) {
+        alert('Evolution ended with code ' + code)
+      }
+      var filename = self.getOnGoingEvolFolder() + '/evolution.json'
+      fs.writeFile(filename, JSON.stringify(self.evolution), function (err) {
+        if (err) {
+          return console.log(err)
+        }
+        console.log('The file was saved!')
+      })
+    })
+
     Event.$on('newEvol', function (_maxGenerations) {
       self.maxGenerations = parseInt(_maxGenerations)
-      console.log('New Evolution')
+      console.log('New Evolution Initialized')
       self.tabIndex = 1
       self.ongoingEvolution = true
-      self.evolution = [{'generation': 1, 'best': -1, 'avg': -1, 'std': -1, 'fitness': []}]
+      self.evolution = [{'generation': 1, 'best': -1000000, 'avg': -1000000, 'std': -1000000, 'fitness': []}]
       self.population = 0
       self.maxFintess = 0
       self.minFitness = 100000000 // Unreasonably high value
-      self.population = 0
       self.message = ''
       self.options.xAxis.data = []
       self.options.series[0].data = []
