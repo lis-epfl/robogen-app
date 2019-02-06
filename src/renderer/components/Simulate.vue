@@ -246,15 +246,15 @@ export default {
       var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'sim.sh'), [robFile, file])
 
       ls.stdout.on('data', function (data) {
-        console.log('stdout: <' + data + '> ')
+        alert('stdout: <' + data + '> ')
       })
 
       ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data)
+        alert('stderr: ' + data)
       })
 
       ls.on('close', function (code) {
-        console.log('child process exited with code ' + code)
+        alert('child process exited with code ' + code)
         // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
         // getDroidOutput().style.background = 'DarkGray'
       })
