@@ -77,10 +77,11 @@
 </template>
 
 <script>
+import path from 'path'
 var app = require('electron').remote
 var dialog = app.dialog
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
-const process = require('child_process') // The power of Node.JS
+const childProcess = require('child_process') // The power of Node.JS
 
 export default {
   props: {
@@ -243,7 +244,7 @@ export default {
           self.filepath.indexOf('examples') + 9,
           self.filepath.length
         )
-        var ls = process.spawn('./scripts/sim/sim.sh', [robFile, 'conf.txt'])
+        var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'), [robFile, 'conf.txt'])
 
         ls.stdout.on('data', function (data) {
           console.log('stdout: <' + data + '> ')

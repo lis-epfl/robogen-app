@@ -8,6 +8,7 @@ const webpack = require('webpack')
 
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const AddPermissionsPlugin = require('webpack-permissions-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -161,11 +162,41 @@ if (process.env.NODE_ENV === 'production') {
     new BabiliWebpackPlugin(),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, '../static'),
+        from: path.join(__dirname, '..','static'),
         to: path.join(__dirname, '../dist/electron/static'),
         ignore: ['.*']
       }
     ]),
+    new AddPermissionsPlugin({
+      //Give executable rights for the script files
+      buildFiles: [
+      //SIM
+      {
+        path: path.resolve(__dirname, '../dist/electron/static/scripts/sim/simCheck.sh'),
+        fileMode: '555'
+      },
+      {
+        path: path.resolve(__dirname, '../dist/electron/static/scripts/sim/start.sh'),
+        fileMode: '555' 
+      },
+      {
+        path: path.resolve(__dirname, '../dist/electron/static/scripts/sim/sim.sh'),
+        fileMode: '555' 
+      },
+      //Evol
+      {
+        path: path.resolve(__dirname, '../dist/electron/static/scripts/evol/evolCheck.sh'),
+        fileMode: '555' 
+      },
+      {
+        path: path.resolve(__dirname, '../dist/electron/static/scripts/evol/start.sh'),
+        fileMode: '555' 
+      },
+      {
+        path: path.resolve(__dirname, '../dist/electron/static/scripts/evol/evol.sh'),
+        fileMode: '555' 
+      }
+    ]}),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),

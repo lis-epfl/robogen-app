@@ -170,11 +170,12 @@
   </form>
 </template>
 <script>
+import path from 'path'
 import FileSelect from './Helper/FileSelect.vue'
 var app = require('electron').remote
 var dialog = app.dialog
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
-const process = require('child_process') // The power of Node.JS
+const childProcess = require('child_process') // The power of Node.JS
 export default {
   props: {
     mainFolderPath: {
@@ -363,10 +364,10 @@ export default {
         )
 
         Event.$emit('newEvol', this.numGenerations)
-        var ls = process.spawn('./scripts/evol/evol.sh', [file, folder])
+        var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evol.sh'), [file, folder])
 
         ls.stdout.on('data', function (data) {
-          // console.log('stdout: <' + data + '> ')
+          console.log('stdout: <' + typeof data + '> ')
           Event.$emit('newData', data)
         })
 

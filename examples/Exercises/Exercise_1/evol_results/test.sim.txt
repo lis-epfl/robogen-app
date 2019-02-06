@@ -2,7 +2,7 @@
 scenario=racing_scenario.js
 
 #Time Parameters 
-simulationTime=10
+simulationTime=12
 timeStep=0.005
 actuationFrequency=25
 

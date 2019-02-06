@@ -1,0 +1,28 @@
+referenceRobotFile=Swimmer.robot.txt
+
+simulatorConfFile=conf.sim.txt
+evolutionMode = brain
+numGenerations = 50
+mu = 25
+lambda = 25
+replacement = plus
+selection = deterministic-tournament
+tournamentSize = 2
+
+#Commonly used brain parameters
+pBrainMutate = 1
+pBrainCrossover = 1
+pAddHiddenNeuron = 0
+pOscillatorNeuron = 0
+
+#Commonly used body variation parameters
+numInitialParts = 4:5
+addBodyPart = LightSensor
+maxBodyParts = 15
+socket=127.0.0.1:49152
+brainBounds=-3:3
+brainSigma=.7
+
+#Other parameters
+evolutionaryAlgorithm=basic
+useBrainSeed=true

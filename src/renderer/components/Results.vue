@@ -19,10 +19,17 @@
       <hr>
       <b-tabs v-model="tabIndex">
         <b-tab title="Past Evolutions">
+
+          <div v-if="resultFolders.length==0" style="text-align:center">
+            <p>No Past evoltions found.</p>
+          </div>
+          <div v-else>
+
           <b-form-select v-model="selectedFolder" class="mb-3">
             <option :value="null" disabled>-- Please select an pre-evolved folder --</option>
             <option v-for="folder in resultFolders" :key="folder" :title="folder" :value="folder">{{folder}}</option>
           </b-form-select>
+          <div v-if="selectedFolder!=''">
             <br>
             <div style="width:100%">
               <v-chart :options="pastGraphOptions" :autoResize="true"/>
@@ -33,19 +40,19 @@
                 <b-row>
                   <b-col cols="12">
                 <b-progress :max="pastPopulation" >
-                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess , data.item.fitness, true)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue)" style="width:100%;height:100%"></span></b-progress-bar>
+                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess , data.item.fitness, true)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue, false)" style="width:100%;height:100%"></span></b-progress-bar>
                 </b-progress>
                   </b-col>
                 </b-row>
               </template>
               <template slot="row-details" slot-scope="data">
-                <b-card v-if="nnVis.generation == data.item.generation">
+                <b-card v-if="pastNnVis.generation == data.item.generation">
                   <br>
                   <b-row class="mb-2">
-                    <b-col class="text-center" style="font-size:25px;">Generation {{nnVis.generation}} (Individual {{nnVis.individual}})</b-col>
+                    <b-col class="text-center" style="font-size:25px;">Generation {{pastNnVis.generation}} (Individual {{pastNnVis.individual}})</b-col>
                   </b-row>
                   <b-row class="mb-2">
-                    <b-table bordered outlined small fixed :items="nnVis.items" :fields="nnVis.fields">
+                    <b-table bordered outlined small fixed :items="pastNnVis.items" :fields="pastNnVis.fields">
                       <template slot="x" slot-scope="neuron">
                         <div v-b-tooltip.hover :title="getTooltipForNNVisItem(neuron)">
                            <span v-if="neuron.item.x.type==='sigmoid'">SIG</span>
@@ -54,7 +61,7 @@
                            <span v-else>{{neuron.item.x.type}}</span>
                          </div>
                       </template>
-                      <template v-for="(title,index) in nnVis.fields" :slot="getTitle(title)" slot-scope="neuron">
+                      <template v-for="(title,index) in pastNnVis.fields" :slot="getTitle(title)" slot-scope="neuron">
                          <div v-b-tooltip.hover :title="getTooltipForNNVis(neuron)" :key="index">
                            <span v-if="neuron.field.type==='sigmoid'">SIG</span>
                            <span v-else-if="neuron.field.type==='simple'">IN</span>
@@ -86,9 +93,14 @@
                 <span v-else>{{data.item.std}}</span>
               </template>
             </b-table>
+          </div>
+          <div v-else style="text-align:center">
+            <p>Please select one of the evolutions to Visuvalize.</p>
+          </div>
+          </div>
         </b-tab>
 
-        <b-tab title="Ongoing Evolution" key="Ongoing Evolution" disabled="!ongoingEvolution" >
+        <b-tab title="Ongoing Evolution" key="Ongoing Evolution"  >
             <br>
             <div style="width:100%">
             <v-chart :options="options" :autoResize="true"/>
@@ -105,7 +117,7 @@
                 <b-row>
                   <b-col cols="12">
                 <b-progress :max="population" >
-                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess , data.item.fitness, true)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue)" style="width:100%;height:100%"></span></b-progress-bar>
+                  <b-progress-bar v-for="(fitnessValue,index) in data.item.fitness" :key="index" :value="1" v-b-tooltip.hover :title="getTooltip(data.item.generation, index , fitnessValue)" :style="{ backgroundColor: getColour(fitnessValue, minFitness, maxFintess , data.item.fitness, true)}" style="cursor: pointer;"><span v-on:click="getVis(data.item.generation, index , fitnessValue,true)" style="width:100%;height:100%"></span></b-progress-bar>
                 </b-progress>
                   </b-col>
                 </b-row>
@@ -330,6 +342,7 @@ export default {
         }
       },
       nnVis: { 'generation': 0, 'individual': 0, 'items': [], 'fields': [] },
+      pastNnVis: { 'generation': 0, 'individual': 0, 'items': [], 'fields': [] },
       colours: []
 
     }
@@ -437,9 +450,14 @@ export default {
       }
       return folder
     },
-    getVis (generation, index, fitnessValue) {
+    getVis (generation, index, fitnessValue, ongoingEvolution) {
       var individual = index + 1 // Update by one for individual
-      var folder = this.getOnGoingEvolFolder()
+      var folder = ''
+      if (ongoingEvolution) {
+        folder = this.getOnGoingEvolFolder()
+      } else {
+        folder = this.projectFolderPath + '/' + this.selectedFolder
+      }
       // Get Sim Conf File from the folder
       var simConfFile = folder
       var files = fs.readdirSync(folder)
@@ -451,8 +469,8 @@ export default {
       }
 
       var vis = {}
-      // vis['robotfile'] = folder + '/Generation-' + generation + '-Guy-' + individual + '.json'
-      vis['robotfile'] = folder + '/GenerationBest-' + generation + '.json'
+      vis['robotfile'] = folder + '/Generation-' + generation + '-Guy-' + individual + '.json'
+      // vis['robotfile'] = folder + '/GenerationBest-' + generation + '.json'
       vis['simConfFile'] = simConfFile
 
       fs.readFile(vis['robotfile'], 'utf-8', (err, data) => {
@@ -463,6 +481,7 @@ export default {
         var neuralNetwork = JSON.parse(data)
         var tempFields = {}
         var connection = {}
+        console.log(connection)
         var allLabel = {} // Contains column id {'neuron id': temprory id}
         var zeroArray = []
         tempFields['x'] = {}
@@ -481,32 +500,48 @@ export default {
 
         // Initialize the connections with 0 matrix
         for (var key in connection) {
-          connection[key] = zeroArray
+          connection[key] = new Array(zeroArray.length).fill(0)
         }
         if (neuralNetwork.brain.hasOwnProperty('connection')) {
-          // Update the connections with 0 matrix
+          // Update the connections
           for (i = 0; i < neuralNetwork.brain.connection.length; i++) {
             var tempIndex = allLabel[neuralNetwork.brain.connection[i].src]
             connection[neuralNetwork.brain.connection[i].dest][tempIndex] = neuralNetwork.brain.connection[i].weight.toFixed(2)
           }
         }
-
-        this.nnVis.fields = tempFields
-        this.nnVis.items = [] // Reset
-
-        for (key in connection) {
-          var connectionItem = {}
-          connectionItem['x'] = tempFields[key]
-          var j = 0
-          for (var key2 in allLabel) {
-            connectionItem[key2] = connection[key][j]
-            j++
+        if (ongoingEvolution) {
+          this.nnVis.fields = tempFields
+          this.nnVis.items = [] // Reset
+          var connectionItem, j, key2
+          for (key in connection) {
+            connectionItem = {}
+            connectionItem['x'] = tempFields[key]
+            j = 0
+            for (key2 in allLabel) {
+              connectionItem[key2] = connection[key][j]
+              j++
+            }
+            this.nnVis.items.push(connectionItem)
           }
-          this.nnVis.items.push(connectionItem)
-        }
-        this.nnVis['generation'] = generation
-        this.nnVis['individual'] = individual
+          this.nnVis['generation'] = generation
+          this.nnVis['individual'] = individual
+        } else {
+          this.pastNnVis.fields = tempFields
+          this.pastNnVis.items = [] // Reset
 
+          for (key in connection) {
+            connectionItem = {}
+            connectionItem['x'] = tempFields[key]
+            j = 0
+            for (key2 in allLabel) {
+              connectionItem[key2] = connection[key][j]
+              j++
+            }
+            this.pastNnVis.items.push(connectionItem)
+          }
+          this.pastNnVis['generation'] = generation
+          this.pastNnVis['individual'] = individual
+        }
         Event.$emit('visualize', vis) // Visuvalize the robot
       })
     },
@@ -699,7 +734,7 @@ export default {
   created () {
     var self = this
     Event.$on('newData', function (msg) {
-      self.updateResult(new TextDecoder('utf-8').decode(msg))
+      self.updateResult(msg)
     })
 
     Event.$on('endEvol', function (code) {
@@ -730,6 +765,7 @@ export default {
       self.options.series[1].data = []
       self.options.series[2].data = []
       self.options.series[3].data = []
+      self.nnVis = { 'generation': 0, 'individual': 0, 'items': [], 'fields': [] }
     })
 
     this.colours = cmap({ 'colormap': 'bluered', 'nshades': 1000 })

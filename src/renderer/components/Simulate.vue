@@ -83,11 +83,12 @@
   </form>
 </template>
 <script>
+import path from 'path'
 import FileSelect from './Helper/FileSelect.vue'
 var app = require('electron').remote
 var dialog = app.dialog
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
-const process = require('child_process') // The power of Node.JS
+const childProcess = require('child_process') // The power of Node.JS
 export default {
   props: {
     mainFolderPath: {
@@ -242,7 +243,7 @@ export default {
         robotFile.length
       )
 
-      var ls = process.spawn('./scripts/sim/sim.sh', [robFile, file])
+      var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'sim.sh'), [robFile, file])
 
       ls.stdout.on('data', function (data) {
         console.log('stdout: <' + data + '> ')

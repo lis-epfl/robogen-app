@@ -18,7 +18,8 @@
 </template>
 
 <script>
-const process = require('child_process') // The power of Node.JS
+import path from 'path'
+const childProcess = require('child_process') // The power of Node.JS
 export default {
   data () {
     return {
@@ -32,29 +33,29 @@ export default {
       this.$parent.show('home')
     },
     activateEvol: function () {
-      // var ls = process.spawn('ls', ['-l']);
-      var ls = process.spawn('./scripts/evol/start.sh')
+      // var ls = childProcess.spawn('ls', ['-l']);
+      var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'start.sh'))
       var self = this
       ls.stdout.on('data', function (data) {
-        console.log('stdout: <' + data + '> ')
+        alert('stdout: <' + data + '> ')
       })
 
       ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data)
+        alert('stderr: ' + data)
         if (data.includes('is already in use by container')) {
           self.validateEvol()
         }
       })
 
       ls.on('close', function (code) {
-        console.log('child process exited with code ' + code)
+        alert('child Process exited with code ' + code)
         // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
         // getDroidOutput().style.background = 'DarkGray'
       })
     },
     validateEvol: function () {
       var self = this
-      var ls = process.spawn('./scripts/evol/evolCheck.sh')
+      var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evolCheck.sh'))
 
       ls.stdout.on('data', function (data) {
         if (data.includes('good')) {
@@ -63,40 +64,41 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data)
+        alert('stderr: ' + data)
         self.evolStatus = false
         if (data.includes('No such container: robogen')) {
-          console.log('Restart Evolve')
+          alert('Restart Evolve')
           self.activateEvol()
         }
       })
 
       ls.on('close', function (code) {
-        // console.log('child process exited with code ' + code)
+        // alert('child process exited with code ' + code)
         if (code !== 0) {
-          console.log('child process exited with code ' + code)
+          alert('child process exited with code ' + code)
         }
         // getDroidOutput().style.background = 'DarkGray'
       })
     },
 
     activateSim: function () {
-      // var ls = process.spawn('ls', ['-l']);
-      var ls = process.spawn('./scripts/sim/start.sh')
+      // var ls = childProcess.spawn('ls', ['-l']);
+
+      var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'start.sh'))
       var self = this
       ls.stdout.on('data', function (data) {
-        console.log('stdout: <' + data + '> ')
+        alert('stdout: <' + data + '> ')
       })
 
       ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data)
+        alert('stderr: ' + data)
         if (data.includes('is already in use by container')) {
           self.validateSim()
         }
       })
 
       ls.on('close', function (code) {
-        console.log('child process exited with code ' + code)
+        alert('child process exited with code ' + code)
         self.validateSim()
         // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
         // getDroidOutput().style.background = 'DarkGray'
@@ -104,7 +106,8 @@ export default {
     },
     validateSim: function () {
       var self = this
-      var ls = process.spawn('./scripts/sim/simCheck.sh')
+
+      var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'))
 
       ls.stdout.on('data', function (data) {
         if (data.includes('good')) {
@@ -113,16 +116,15 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data)
+        alert('stderr: ' + data)
         self.simStatus = false
       })
 
       ls.on('close', function (code) {
-        // console.log('child process exited with code ' + code)
+        // alert('child process exited with code ' + code)
         if (code !== 0) {
-          console.log('child process exited with code ' + code)
+          alert('child process exited with code ' + code)
         }
-        // getDroidOutput().style.background = 'DarkGray'
       })
     },
     validate: function () {
