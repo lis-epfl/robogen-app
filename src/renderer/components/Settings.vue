@@ -37,20 +37,21 @@ export default {
       var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'start.sh'))
       var self = this
       ls.stdout.on('data', function (data) {
-        alert('stdout: <' + data + '> ')
+        console.log('stdout: <' + data + '> ')
       })
 
       ls.stderr.on('data', function (data) {
-        alert('stderr: ' + data)
         if (data.includes('is already in use by container')) {
           self.validateEvol()
+        } else {
+          alert('stderr activateEvol: ' + data)
         }
       })
 
       ls.on('close', function (code) {
-        alert('child Process exited with code ' + code)
-        // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
-        // getDroidOutput().style.background = 'DarkGray'
+        if (code !== 0 && code !== 125) {
+          alert('activateEvol process exited with code ' + code)
+        }
       })
     },
     validateEvol: function () {
@@ -64,41 +65,41 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        alert('stderr: ' + data)
+        //
         self.evolStatus = false
         if (data.includes('No such container: robogen')) {
-          alert('Restart Evolve')
+          // alert('Restart Evolve')
           self.activateEvol()
+        } else {
+          alert('stderr validateEvol: ' + data)
         }
       })
 
       ls.on('close', function (code) {
-        // alert('child process exited with code ' + code)
-        if (code !== 0) {
-          alert('child process exited with code ' + code)
+        if (code !== 0 && code !== 1 && code < 128) {
+          alert('validateEvol process exited with code ' + code)
         }
-        // getDroidOutput().style.background = 'DarkGray'
       })
     },
 
     activateSim: function () {
-      // var ls = childProcess.spawn('ls', ['-l']);
-
       var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'start.sh'))
       var self = this
       ls.stdout.on('data', function (data) {
-        alert('stdout: <' + data + '> ')
+        console.log('stdout: <' + data + '> ')
       })
 
       ls.stderr.on('data', function (data) {
-        alert('stderr: ' + data)
+        alert('stderr activateSim: ' + data)
         if (data.includes('is already in use by container')) {
           self.validateSim()
         }
       })
 
       ls.on('close', function (code) {
-        alert('child process exited with code ' + code)
+        if (code !== 0) {
+          alert('activatesim process exited with code ' + code)
+        }
         self.validateSim()
         // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
         // getDroidOutput().style.background = 'DarkGray'
@@ -116,14 +117,14 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        alert('stderr: ' + data)
+        alert('stderr validateSim: ' + data)
         self.simStatus = false
       })
 
       ls.on('close', function (code) {
         // alert('child process exited with code ' + code)
         if (code !== 0) {
-          alert('child process exited with code ' + code)
+          alert('validateSim process exited with code ' + code)
         }
       })
     },

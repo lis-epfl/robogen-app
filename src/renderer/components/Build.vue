@@ -342,19 +342,20 @@ export default {
       if (this.saved) {
         return true
       } else {
-        var result = dialog.showMessageBox({
-          title: 'Save Changes',
-          message: 'Do you want to save the new changes in robot file?',
-          buttons: ['Yes', 'No'],
-          cancelId: 1
-        })
-        if (result === 0) {
-          // Save file
-          this.save_file()
-        } else {
-          // discard
-        }
-        // this.$parent.show('home')
+        this.save_file()
+        // var result = dialog.showMessageBox({
+        //   title: 'Save Changes',
+        //   message: 'Do you want to save the new changes in robot file?',
+        //   buttons: ['Yes', 'No'],
+        //   cancelId: 1
+        // })
+        // if (result === 0) {
+        //   // Save file
+        //   this.save_file()
+        // } else {
+        //   // discard
+        // }
+        // // this.$parent.show('home')
       }
     },
     tabber (event, model) {

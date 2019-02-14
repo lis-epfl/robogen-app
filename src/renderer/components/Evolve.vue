@@ -499,8 +499,6 @@ export default {
         ls.on('close', function (code) {
           console.log('child process exited with code ' + code)
           Event.$emit('endEvol', code)
-          // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
-          // getDroidOutput().style.background = 'DarkGray'
         })
       }
     },

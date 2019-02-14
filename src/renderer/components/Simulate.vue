@@ -346,8 +346,6 @@ export default {
         if (code !== 0) {
           alert('child process exited with code ' + code)
         }
-        // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
-        // getDroidOutput().style.background = 'DarkGray'
       })
     },
     getFileName: function (filePath) {
