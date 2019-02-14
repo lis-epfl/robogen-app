@@ -263,7 +263,7 @@ export default {
       return content
     },
     // Save file
-    save_file: function () {
+    save_file: function (doSimulate) {
       console.log(this.projectFolderPath)
       var content = this.get_content()
       // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
@@ -279,15 +279,15 @@ export default {
               console.log("You didn't save the file")
               return
             }
-            this.writeToFile(fileName, content)
+            this.writeToFile(fileName, content, doSimulate)
           }
         )
       } else {
         var fileName = this.projectFolderPath + '/' + this.name + '.robot.txt'
-        this.writeToFile(fileName, content)
+        this.writeToFile(fileName, content, doSimulate)
       }
     },
-    writeToFile: function (fileName, content) {
+    writeToFile: function (fileName, content, doSimulate) {
       // fileName is a string that contains the path and filename created in the save file dialog.
       fs.writeFile(fileName, content, err => {
         if (err) {
@@ -295,6 +295,9 @@ export default {
         }
         this.filepath = fileName
         this.saved = true
+        if (doSimulate) {
+          this.runTest()
+        }
       })
       // console.log(success)
       // if (success) {
@@ -306,8 +309,12 @@ export default {
     testRobot: function () {
       var self = this
       if (!this.saved) {
-        self.save_file()
+        self.save_file(true)
+      } else {
+        this.runTest()
       }
+    },
+    runTest: function () {
       var robFile = self.filepath.substring(
         self.filepath.indexOf('examples') + 9,
         self.filepath.length

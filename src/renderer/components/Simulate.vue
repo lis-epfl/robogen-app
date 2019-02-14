@@ -22,7 +22,7 @@
               :title="simFile"
               :value="simFile"
             >{{simFile}}</option>
-            <option value="NewSim" key="NewSim" title="NewSim">-- Create a Simulation Settings --</option>
+            <option :value="null" disabled>-- Please select an simulation Settings </option>
           </b-form-select>
         </div>
       </div>
@@ -298,7 +298,11 @@ export default {
       }
     },
     testSim: function () {
-      this.save_sim_file(true)
+      if (!this.saved) {
+        this.save_sim_file(true)
+      } else {
+        self.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
+      }
     },
     simulate (mainFolderPath, simFilePath, robotFile) {
       if (
@@ -401,8 +405,6 @@ export default {
         this.name = ''
         this.localProjectFolderPath = this.projectFolderPath
         this.localSimFiles = this.simFiles
-        this.$refs.robotFile.updateFilePath(this.robotFile)
-        this.$refs.scenarioFile.updateFilePath(this.scenarioFile)
       }
       this.saved = true
     }

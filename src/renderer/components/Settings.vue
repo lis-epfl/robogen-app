@@ -136,8 +136,12 @@ export default {
     },
     execute: function () {}
   },
-  mounted () {
+  created () {
     this.validate()
+    var self = this
+    Event.$on('updateFiles', function () {
+      self.validateEvol()
+    })
   }
 }
 </script>

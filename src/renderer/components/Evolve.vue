@@ -2,23 +2,43 @@
   <form class="vue-form" @submit.prevent="submit">
     <fieldset>
       <div class="row">
-          <div class="col-sm-8" style="padding:0"> <legend>Evolver Configuration <legend style="font-size:16px">{{name}}.evol.txt <span v-if="!saved" style="cursor:pointer; text-decoration:underline; color:blue" @click="save_evol_file">Save</span></legend></legend></div>
-          <div class="col-sm-4" style="padding:0">
-          Evolution Settings: 
+        <div class="col-sm-8" style="padding:0">
+          <legend>Evolver Configuration
+            <legend style="font-size:16px">
+              {{name}}.evol.txt
+              <span
+                v-if="!saved"
+                style="cursor:pointer; text-decoration:underline; color:blue"
+                @click="save_evol_file"
+              >Save</span>
+            </legend>
+          </legend>
+        </div>
+        <div class="col-sm-4" style="padding:0">Evolution Settings:
           <b-form-select v-model="selectedEvolFile" class="mb-3">
+            <option
+              v-for="evolFile in evolFiles"
+              :key="evolFile"
+              :title="evolFile"
+              :value="evolFile"
+            >{{evolFile}}</option>
             <option :value="null" disabled>-- Please select an Evolution Settings --</option>
-            <option v-for="evolFile in evolFiles" :key="evolFile" :title="evolFile" :value="evolFile">{{evolFile}}</option>
           </b-form-select>
-          </div>
+        </div>
       </div>
-      
+
       <div class="row">
         <div class="col-sm-6">
           <div class="row">
-            <label class="label" for="ff">Simulation File (Required) </label>
+            <label class="label" for="ff">Simulation File (Required)</label>
           </div>
           <div class="row">
-            <file-select v-model="simFile" :accept="[{'name': 'Robogen Simulation File', 'ext' :['sim.txt']}]" :defaultPath="projectFolderPath" ref="simFile"></file-select>
+            <file-select
+              v-model="simFile"
+              :accept="[{'name': 'Robogen Simulation File', 'ext' :['sim.txt']}]"
+              :defaultPath="projectFolderPath"
+              ref="simFile"
+            ></file-select>
           </div>
         </div>
         <div class="col-sm-6">
@@ -26,19 +46,24 @@
             <label class="label" for="robot">Robot File (Optional for full evolution)</label>
           </div>
           <div class="row">
-            <file-select v-model="robotFile" :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt','json']}]" :defaultPath="projectFolderPath" :optional="true" ref="robotFile"></file-select>
+            <file-select
+              v-model="robotFile"
+              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt','json']}]"
+              :defaultPath="projectFolderPath"
+              :optional="true"
+              ref="robotFile"
+            ></file-select>
           </div>
-            <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
+          <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
         </div>
       </div>
       <div class="row">
         <div class="col-sm-3">
           <div class="row">
-          <label class="label" for="vue-form-list">Evolution Mode </label>
+            <label class="label" for="vue-form-list">Evolution Mode</label>
           </div>
           <ul class="vue-form-list">
             <li>
-              
               <input type="radio" value="brain" v-model="evolutionMode">
               <label for="radio-1">Brain</label>
             </li>
@@ -49,27 +74,32 @@
           </ul>
         </div>
         <div class="col-sm-3">
-            <label class="label" for="numGenerations">Number of generations</label>
-            <input type="number" name="numGenerations" id="numGenerations" required="" v-model="numGenerations">
+          <label class="label" for="numGenerations">Number of generations</label>
+          <input
+            type="number"
+            name="numGenerations"
+            id="numGenerations"
+            required
+            v-model="numGenerations"
+          >
         </div>
         <div class="col-sm-3">
-            <label class="label" for="mu">Mu (&mu;) </label>
-            <input type="number" name="mu" id="mu" required="" v-model="mu">
+          <label class="label" for="mu">Mu (&mu;)</label>
+          <input type="number" name="mu" id="mu" required v-model="mu">
         </div>
         <div class="col-sm-3">
-            <label class="label" for="lambda">Lambda (&lambda;)</label>
-            <input type="number" name="lambda" id="lambda" required="" v-model="lambda">   
+          <label class="label" for="lambda">Lambda (&lambda;)</label>
+          <input type="number" name="lambda" id="lambda" required v-model="lambda">
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-3">
           <div class="row">
-          <label class="label" for="vue-form-list">Replacement</label>
+            <label class="label" for="vue-form-list">Replacement</label>
           </div>
           <ul class="vue-form-list">
             <li>
-              
               <input type="radio" value="plus" v-model="replacement">
               <label for="radio-1">Plus</label>
             </li>
@@ -80,90 +110,144 @@
           </ul>
         </div>
         <div class="col-sm-3">
-            <label class="label" for="tournamentSize">Tournament Size</label>
-            <input type="number" name="tournamentSize" id="tournamentSize" required="" v-model="tournamentSize">
+          <label class="label" for="tournamentSize">Tournament Size</label>
+          <input
+            type="number"
+            name="tournamentSize"
+            id="tournamentSize"
+            required
+            v-model="tournamentSize"
+          >
         </div>
       </div>
 
       <div class="row">
         <div role="tablist" class="tablist">
-    <b-card no-body class="mb-1">
-      <b-card-header header-tag="header" class="p-1" role="tab" style="height:inherit">
-        <b-btn block href="#" v-b-toggle.accordion1 variant="light" style="text-align:left"> <font-awesome-icon icon="chevron-down" /> &nbsp; Brain Variation Probabilities and Magnitudes</b-btn>
-      </b-card-header>
-      <b-collapse id="accordion1" visible accordion="my-accordion" role="tabpanel">
-        <b-card-body>
-          <div class="row">
-        <div class="col-sm-3">
-            <label class="label" for="pBrainMutate">Brain Mutation Probability</label>
-            <input type="number" name="pBrainMutate" id="pBrainMutate" min="0" max="1" step="0.01"  required="" v-model="pBrainMutate">
+          <b-card no-body class="mb-1">
+            <b-card-header header-tag="header" class="p-1" role="tab" style="height:inherit">
+              <b-btn block href="#" v-b-toggle.accordion1 variant="light" style="text-align:left">
+                <font-awesome-icon icon="chevron-down"/>&nbsp; Brain Variation Probabilities and Magnitudes
+              </b-btn>
+            </b-card-header>
+            <b-collapse id="accordion1" visible accordion="my-accordion" role="tabpanel">
+              <b-card-body>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <label class="label" for="pBrainMutate">Brain Mutation Probability</label>
+                    <input
+                      type="number"
+                      name="pBrainMutate"
+                      id="pBrainMutate"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      required
+                      v-model="pBrainMutate"
+                    >
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="label" for="pBrainCrossover">Brain Crossover Probability</label>
+                    <input
+                      type="number"
+                      name="pBrainCrossover"
+                      id="pBrainCrossover"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      v-model="pBrainCrossover"
+                    >
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="label" for="pAddHiddenNeuron">Add Hidden Neuron Probability</label>
+                    <input
+                      type="number"
+                      name="pAddHiddenNeuron"
+                      id="pAddHiddenNeuron"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      v-model="pAddHiddenNeuron"
+                    >
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="label" for="pOscillatorNeuron">Add Oscillator Neuron Probability</label>
+                    <input
+                      type="number"
+                      name="pOscillatorNeuron"
+                      id="pOscillatorNeuron"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      v-model="pOscillatorNeuron"
+                    >
+                  </div>
+                </div>
+              </b-card-body>
+            </b-collapse>
+          </b-card>
+          <b-card no-body class="mb-1">
+            <b-card-header header-tag="header" class="p-1" role="tab" style="height:inherit">
+              <b-btn block href="#" v-b-toggle.accordion2 variant="light" style="text-align:left">
+                <font-awesome-icon icon="chevron-down"/>&nbsp; Body Variation Parameters
+              </b-btn>
+            </b-card-header>
+            <b-collapse id="accordion2" accordion="my-accordion" role="tabpanel">
+              <b-card-body>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <label class="label" for="numInitialParts">Number of inital body parts (min:max)</label>
+                    <input
+                      type="text"
+                      name="numInitialParts"
+                      id="numInitialParts"
+                      v-model="numInitialParts"
+                    >
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="label" for="addBodyPart">Body Parts that can be added</label>
+                    <input type="text" name="addBodyPart" id="addBodyPart" v-model="addBodyPart">
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="label" for="maxBodyParts">Maximum Body Parts</label>
+                    <input
+                      type="number"
+                      name="maxBodyParts"
+                      id="maxBodyParts"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      v-model="maxBodyParts"
+                    >
+                  </div>
+                  <div class="col-sm-3">
+                    <p class="label">Other parameters can be added in other text box</p>
+                  </div>
+                </div>
+              </b-card-body>
+            </b-collapse>
+          </b-card>
         </div>
-        <div class="col-sm-3">
-            <label class="label" for="pBrainCrossover">Brain Crossover Probability</label>
-            <input type="number" name="pBrainCrossover" id="pBrainCrossover" min="0" max="1" step="0.01" v-model="pBrainCrossover">
-        </div>
-        <div class="col-sm-3">
-            <label class="label" for="pAddHiddenNeuron">Add Hidden Neuron Probability</label>
-            <input type="number" name="pAddHiddenNeuron" id="pAddHiddenNeuron" min="0" max="1" step="0.01" v-model="pAddHiddenNeuron">   
-        </div>
-        <div class="col-sm-3">
-            <label class="label" for="pOscillatorNeuron">Add Oscillator Neuron Probability</label>
-            <input type="number" name="pOscillatorNeuron" id="pOscillatorNeuron" min="0" max="1" step="0.01" v-model="pOscillatorNeuron">   
-        </div>
-      </div>
-
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-    <b-card no-body class="mb-1">
-      <b-card-header header-tag="header" class="p-1" role="tab" style="height:inherit">
-        <b-btn block href="#" v-b-toggle.accordion2 variant="light" style="text-align:left"> <font-awesome-icon icon="chevron-down" /> &nbsp; Body Variation Parameters</b-btn>
-      </b-card-header>
-      <b-collapse id="accordion2" accordion="my-accordion" role="tabpanel">
-        <b-card-body>
-          <div class="row">
-        <div class="col-sm-3">
-            <label class="label" for="numInitialParts">Number of inital body parts (min:max)</label>
-            <input type="text" name="numInitialParts" id="numInitialParts" v-model="numInitialParts">
-        </div>
-        <div class="col-sm-3">
-            <label class="label" for="addBodyPart">Body Parts that can be added</label>
-            <input type="text" name="addBodyPart" id="addBodyPart" v-model="addBodyPart">
-        </div>
-        <div class="col-sm-3">
-            <label class="label" for="maxBodyParts">Maximum Body Parts</label>
-            <input type="number" name="maxBodyParts" id="maxBodyParts" min="0" max="1" step="0.01" v-model="maxBodyParts">   
-        </div>
-        <div class="col-sm-3">
-            <p class="label">Other parameters can be added in other text box</p>   
-        </div>
-      </div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-  </div>
       </div>
 
       <div class="row">
-          <div class="col-sm-12">
+        <div class="col-sm-12">
           <label class="label" for="textarea">Other Parameters</label>
-          <textarea  name="textarea" id="textarea" v-model="other"></textarea>
-          </div>
+          <textarea name="textarea" id="textarea" v-model="other"></textarea>
+        </div>
       </div>
 
       <br>
 
       <div class="row" style="display:none">
-        
         <div class="debug-simulate">
-          <div class="robotFileInEvolve"> {{referenceRobotFile}}</div>
-            <pre><code>{{ simConfig }}</code></pre>
+          <div class="robotFileInEvolve">{{referenceRobotFile}}</div>
+          <pre><code>{{ simConfig }}</code></pre>
         </div>
       </div>
 
       <div class="row">
-        <div style="width:100%" >
-          <input type="button" value="Evolve" :disabled="!isValid" @click="testEvol" >
+        <div style="width:100%">
+          <input type="button" value="Evolve" :disabled="!isValid" @click="testEvol">
         </div>
       </div>
     </fieldset>
@@ -230,21 +314,25 @@ export default {
       localMainFolerPath: this.mainFolderPath
     }
   },
-  methods: {// Load file
+  methods: {
+    // Load file
     open_file: function () {
-      dialog.showOpenDialog({
-        filters: [
-          { name: 'Robogen Evolution File', extensions: ['evol.txt'] }
-        ],
-        defaultPath: this.projectFolderPath
-      }, (fileNames) => {
-        // fileNames is an array that contains all the selected
-        if (fileNames === undefined) {
-          console.log('No file selected')
-          return
+      dialog.showOpenDialog(
+        {
+          filters: [
+            { name: 'Robogen Evolution File', extensions: ['evol.txt'] }
+          ],
+          defaultPath: this.projectFolderPath
+        },
+        fileNames => {
+          // fileNames is an array that contains all the selected
+          if (fileNames === undefined) {
+            console.log('No file selected')
+            return
+          }
+          this.load_evol_file(fileNames[0])
         }
-        this.load_evol_file(fileNames[0])
-      })
+      )
     },
     load_evol_file: function (fileName) {
       fs.readFile(fileName, 'utf-8', (err, data) => {
@@ -252,7 +340,10 @@ export default {
           alert('An error ocurred reading the file :' + err.message)
           return
         }
-        this.name = fileName.substring(fileName.lastIndexOf('/') + 1, fileName.indexOf('.'))
+        this.name = fileName.substring(
+          fileName.lastIndexOf('/') + 1,
+          fileName.indexOf('.')
+        )
         var params = data.split('\n')
         this.other = ''
 
@@ -279,7 +370,9 @@ export default {
     updateData: function (param) {
       if (param.includes('simulatorConfFile=')) {
         this.simFile = param.substring('simulatorConfFile='.length)
-        this.$refs.simFile.updateFilePath(this.projectFolderPath + '/' + this.simFile)
+        this.$refs.simFile.updateFilePath(
+          this.projectFolderPath + '/' + this.simFile
+        )
       } else if (param.includes('evolutionMode=')) {
         this.evolutionMode = param.substring('evolutionMode='.length)
       } else if (param.includes('numGenerations=')) {
@@ -312,43 +405,69 @@ export default {
         this.referenceRobotFile = param.substring('referenceRobotFile='.length)
         this.$refs.robotFile.updateFilePath(this.referenceRobotFile)
         this.robotFile = this.referenceRobotFile
-      } else if (param.includes('socket=') || param.includes('brainBounds=') || param.includes('brainSigma=')) {
+      } else if (
+        param.includes('socket=') ||
+        param.includes('brainBounds=') ||
+        param.includes('brainSigma=')
+      ) {
         // Do nothing
       } else {
         this.other += param + '\n'
       }
     },
-    save_evol_file: function () {
+    save_evol_file: function (doEvolve) {
       var self = this
       // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
-      dialog.showSaveDialog(
-        {
-          defaultPath: this.projectFolderPath + '/' + this.name + '.evol.txt',
-          filters: [{ name: 'Robogen Evol File', extensions: ['evol.txt'] }]
-        },
-        fileName => {
-          if (fileName === undefined) {
-            console.log("You didn't save the file")
-            return
-          }
-
-          // fileName is a string that contains the path and filename created in the save file dialog.
-          fs.writeFile(fileName, self.content, err => {
-            if (err) {
-              alert('An error ocurred creating the file ' + err.message)
+      if (this.selectedEvolFile === '') {
+        dialog.showSaveDialog(
+          {
+            defaultPath: this.projectFolderPath + '/' + this.name + '.evol.txt',
+            filters: [{ name: 'Robogen Evol File', extensions: ['evol.txt'] }]
+          },
+          fileName => {
+            if (fileName === undefined) {
+              console.log("You didn't save the file")
+              return
             }
-            this.saved = true
-            this.filepath = fileName
-            alert('The file has been succesfully saved')
-          })
-        }
-      )
+
+            // fileName is a string that contains the path and filename created in the save file dialog.
+            fs.writeFile(fileName, self.content, err => {
+              if (err) {
+                alert('An error ocurred creating the file ' + err.message)
+              }
+              this.saved = true
+              this.filepath = fileName
+              if (doEvolve) {
+                this.testEvol()
+              }
+            })
+          }
+        )
+      } else {
+        var fileName = this.projectFolderPath + '/' + this.name + '.evol.txt'
+        fs.writeFile(fileName, self.content, err => {
+          if (err) {
+            alert('An error ocurred creating the file ' + err.message)
+          }
+          this.saved = true
+          this.filepath = fileName
+          if (doEvolve) {
+            this.testEvol()
+          }
+        })
+      }
     },
     testEvol: function () {
       var self = this
+      if (!this.saved) {
+        this.save_evol_file(true)
+      }
       if (this.saved) {
         if (!self.filepath.includes('examples')) {
-          alert('Only the files in the example folder can used. Current filepath = ' + self.filepath)
+          alert(
+            'Only the files in the example folder can used. Current filepath = ' +
+              self.filepath
+          )
           return
         }
         var file = self.filepath.substring(
@@ -358,13 +477,13 @@ export default {
         console.log(file)
         console.log(file.lastIndexOf('/'))
 
-        var folder = file.substring(
-          0,
-          file.lastIndexOf('/')
-        )
+        var folder = file.substring(0, file.lastIndexOf('/'))
 
         Event.$emit('newEvol', this.numGenerations)
-        var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evol.sh'), [file, folder])
+        var ls = childProcess.execFile(
+          path.join(__static, 'scripts', 'evol', 'evol.sh'),
+          [file, folder]
+        )
 
         ls.stdout.on('data', function (data) {
           console.log('stdout: <' + typeof data + '> ')
@@ -383,11 +502,6 @@ export default {
           // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
           // getDroidOutput().style.background = 'DarkGray'
         })
-      } else {
-        self.save_evol_file()
-        if (self.saved) {
-          self.testEvol()
-        }
       }
     },
     getFileName: function (filePath) {
@@ -402,10 +516,12 @@ export default {
       if (this.robotFile === '') {
         this.referenceRobotFile = '#Evolution from scratch'
       } else {
-        this.referenceRobotFile = 'referenceRobotFile=' + this.getFileName(this.robotFile) + '\n\n'
+        this.referenceRobotFile =
+          'referenceRobotFile=' + this.getFileName(this.robotFile) + '\n\n'
         this.content += this.referenceRobotFile
       }
-      this.content += 'simulatorConfFile=' + this.getFileName(this.simFile) + '\n'
+      this.content +=
+        'simulatorConfFile=' + this.getFileName(this.simFile) + '\n'
       this.content += 'evolutionMode = ' + this.evolutionMode + '\n'
       this.content += 'numGenerations = ' + this.numGenerations + '\n'
       this.content += 'mu = ' + this.mu + '\n'
@@ -422,7 +538,8 @@ export default {
       this.content += 'numInitialParts = ' + this.numInitialParts + '\n'
       this.content += 'addBodyPart = ' + this.addBodyPart + '\n'
       this.content += 'maxBodyParts = ' + this.maxBodyParts + '\n'
-      this.content += 'socket=127.0.0.1:49152\nbrainBounds=-3:3\nbrainSigma=.7\n'
+      this.content +=
+        'socket=127.0.0.1:49152\nbrainBounds=-3:3\nbrainSigma=.7\n'
 
       if (this.other !== '') {
         this.content += '\n#Other parameters\n'
@@ -514,7 +631,7 @@ export default {
   tab-size: 2;
 }
 
-.robotFileInEvolve{
+.robotFileInEvolve {
   margin-top: 5px;
   font-family: "Source Code Pro", monospace;
   color: rgb(82, 156, 230);

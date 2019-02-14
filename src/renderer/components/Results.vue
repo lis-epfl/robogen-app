@@ -105,11 +105,13 @@
             <div style="width:100%">
             <v-chart :options="options" :autoResize="true"/>
             </div>
-            <hr>
+            <hr style="margin:0">
             <span class="text-center">Performance scale</span>
               <b-progress :max="100">
                 <b-progress-bar v-for="n in 100" :key="n" :value="1" v-b-tooltip.hover :title="n" :style="{ backgroundColor: getColour(n,1,100,[],false)}" style="cursor: pointer;"><span style="width:100%;height:100%"></span></b-progress-bar>
               </b-progress>
+              <span style="float:left">Poor</span>
+              <span style="float:right">Best</span>
               <hr>
 
             <b-table striped bordered outlined hover footClone :items="evolution" :fields="fields" >
@@ -237,7 +239,7 @@ export default {
           name: 'Generation',
           nameLocation: 'Center',
           nameTextStyle: {
-            padding: [60, 0, 0, 0],
+            padding: [70, 0, 0, 0],
             fontSize: 18
           },
           data: [],
@@ -747,6 +749,7 @@ export default {
           return console.log(err)
         }
         console.log('The file was saved!')
+        Event.$emit('updateFiles')
       })
     })
 
@@ -786,6 +789,6 @@ export default {
   padding: 0.1rem 0.5rem 0rem 0.5rem;
 }
 td[colspan="5"] {
- padding:0
+  padding:0 !important;
 }
 </style>

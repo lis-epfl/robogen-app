@@ -118,17 +118,8 @@ export default {
         }
         return false
       }
-    }
-  },
-  computed: {
-    fireFileChange: function () {
-      var temp = this.projectFolderPath + this.robotFiles + this.simFiles + this.evolFiles // eslint-disable-line no-unused-vars
-      console.log('Firing update..' + temp)
-      //
-    }
-  },
-  watch: {
-    projectFolderPath: function (filepath) {
+    },
+    updateFiles (filepath) {
       if (this.validateProjectFolder() === '') {
         this.otherFiles = []
         this.robotFiles = []
@@ -158,6 +149,25 @@ export default {
         this.checkProjectFiles()
       }
     }
+  },
+  computed: {
+    fireFileChange: function () {
+      var temp = this.projectFolderPath + this.robotFiles + this.simFiles + this.evolFiles // eslint-disable-line no-unused-vars
+      console.log('Firing update..' + temp)
+      //
+    }
+  },
+  watch: {
+    projectFolderPath: function (filepath) {
+      this.updateFiles(filepath)
+    }
+  },
+  created () {
+    var self = this
+    Event.$on('updateFiles', function () {
+      console.log(self.projectFolderPath)
+      self.updateFiles(self.projectFolderPath)
+    })
   }
 }
 </script>
