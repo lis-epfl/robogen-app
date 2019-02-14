@@ -1,77 +1,124 @@
 <template>
   <div class="row" style="width:100%">
     <div class="col-sm-6">
-        <form class="vue-form" @submit.prevent="submit">
-            <fieldset>
-                <div class="row">
-                <div class="col-sm-8" style="padding:0"> <legend style="border:0;margin:0"> Build a robot</legend><label class="label" v-if="saved">Saved</label></div>
-                <div class="col-sm-4" style="padding:0"><input type="button" value="Load File" @click="open_file"></div>
+      <form class="vue-form" @submit.prevent="submit">
+        <fieldset>
+          <div class="row">
+            <div style="padding:0">
+              <legend style="border:0;margin:0;padding:0">Build a robot</legend>
+              <label class="label" style="margin-top:-6px">
+                {{selectedRobotFile}}
+                <span
+                  v-if="!saved"
+                  style="cursor:pointer; text-decoration:underline; color:blue"
+                  @click="save_file"
+                >Save</span>
+              </label>
             </div>
-            {{projectFolderPath}}
-            {{robotFiles}}
-            <div>
-                <label class="label" for="name">Robot Name</label>
-                <input type="text" required="" v-model="name" style="width:100%">
-            </div>
-            
-            <div>
-                <label class="label" for="textarea">Robot Body</label>
-                <textarea @keydown.tab.prevent="tabber($event, 'body')" @keydown.enter.prevent="enter($event, 'body')" name="textarea" id="textarea" required="" 
-                        v-model="body"></textarea>
-            </div>
+          </div>
+          <label class="label" for="textarea">Robot File</label>
+          <b-form-select v-model="selectedRobotFile" class="mb-3">
+            <option
+              v-for="robotFile in robotFiles"
+              :key="robotFile"
+              :title="robotFile"
+              :value="robotFile"
+            >{{robotFile}}</option>
+            <option key="NewRobot" title="NewRobot" value="NewRobot">-- Build your own robot --</option>
+          </b-form-select>
+          <div>
+            <label class="label" for="name">Robot Name</label>
+            <input type="text" :disabled="selectedRobotFile !== '' && selectedRobotFile !== 'NewRobot'" required v-model="name" style="width:100%">
+          </div>
 
-            <div>
-                <label class="label" for="textarea">Hidden Neurons</label>
-                <textarea @keydown.tab.prevent="tabber($event, 'hiddenNeurons')" @keydown.enter.prevent="enter($event, 'hiddenNeurons')" name="textarea" id="textarea" required="" 
-                        v-model="hiddenNeurons" ></textarea>
-            </div>
+          <div>
+            <label class="label" for="textarea">Robot Body</label>
+            <textarea
+              @keydown.tab.prevent="tabber($event, 'body')"
+              @keydown.enter.prevent="enter($event, 'body')"
+              name="textarea"
+              id="textarea"
+              required
+              v-model="body"
+            ></textarea>
+          </div>
 
-            <div>
-                <label class="label" for="textarea">Connections</label>
-                <textarea @keydown.tab.prevent="tabber($event, 'connections')" @keydown.enter.prevent="enter($event, 'connections')" name="textarea" id="textarea" required="" 
-                        v-model="connections"></textarea>
-            </div>
+          <div>
+            <label class="label" for="textarea">Hidden Neurons</label>
+            <textarea
+              @keydown.tab.prevent="tabber($event, 'hiddenNeurons')"
+              @keydown.enter.prevent="enter($event, 'hiddenNeurons')"
+              name="textarea"
+              id="textarea"
+              required
+              v-model="hiddenNeurons"
+            ></textarea>
+          </div>
 
-            <div>
-                <label class="label" for="textarea">Bias</label>
-                <textarea @keydown.tab.prevent="tabber($event, 'bias')" @keydown.enter.prevent="enter($event, 'bias')"  name="textarea" id="textarea" required="" 
-                        v-model="bias"></textarea>
-            </div>
+          <div>
+            <label class="label" for="textarea">Connections</label>
+            <textarea
+              @keydown.tab.prevent="tabber($event, 'connections')"
+              @keydown.enter.prevent="enter($event, 'connections')"
+              name="textarea"
+              id="textarea"
+              required
+              v-model="connections"
+            ></textarea>
+          </div>
 
-
-            <div>
-                <input type="submit" value="Save file" @click="save_file">
-            </div>
-            </fieldset>
-        </form>
+          <div>
+            <label class="label" for="textarea">Bias</label>
+            <textarea
+              @keydown.tab.prevent="tabber($event, 'bias')"
+              @keydown.enter.prevent="enter($event, 'bias')"
+              name="textarea"
+              id="textarea"
+              required
+              v-model="bias"
+            ></textarea>
+          </div>
+        </fieldset>
+      </form>
     </div>
     <div class="col-sm-6">
-        <div class="debug ">
-            <div class="row title-box"><p class="title">{{name}}</p></div>
-            <div v-show="body.length>0">
-                <div class="row"><p class="subtitle">Body</p></div>
-                <pre><code>{{ body }}</code></pre>
-            </div>
-            <div v-show="hiddenNeurons.length>0">
-                <div class="row"><p class="subtitle">Hidden Neurons</p></div>
-                <pre><code>{{ hiddenNeurons }}</code></pre>
-            </div>
-            <div v-show="connections.length>0">
-                <div class="row"><p class="subtitle">Connections</p></div>
-                <pre><code>{{ connections }}</code></pre>
-            </div>
-            <div v-show="bias.length>0">
-                <div class="row"><p class="subtitle">Bias</p></div>
-                <pre><code>{{ bias }}</code></pre>
-            </div>
-            <div v-show="bias.length+connections.length+hiddenNeurons.length+body.length==0">
-                <div class="row"><p class="subtitle" style="color:white;">--Empty--</p></div>
-            </div>
-            <div v-show="bias.length+connections.length+hiddenNeurons.length+body.length>0">
-                <input type="button" value="Test Me" @click="testRobot">
-            </div>
-            
+      <div class="debug">
+        <div class="row title-box">
+          <p class="title">{{name}}</p>
         </div>
+        <div v-show="body.length>0">
+          <div class="row">
+            <p class="subtitle">Body</p>
+          </div>
+          <pre><code>{{ body }}</code></pre>
+        </div>
+        <div v-show="hiddenNeurons.length>0">
+          <div class="row">
+            <p class="subtitle">Hidden Neurons</p>
+          </div>
+          <pre><code>{{ hiddenNeurons }}</code></pre>
+        </div>
+        <div v-show="connections.length>0">
+          <div class="row">
+            <p class="subtitle">Connections</p>
+          </div>
+          <pre><code>{{ connections }}</code></pre>
+        </div>
+        <div v-show="bias.length>0">
+          <div class="row">
+            <p class="subtitle">Bias</p>
+          </div>
+          <pre><code>{{ bias }}</code></pre>
+        </div>
+        <div v-show="bias.length+connections.length+hiddenNeurons.length+body.length==0">
+          <div class="row">
+            <p class="subtitle" style="color:white;">--Empty--</p>
+          </div>
+        </div>
+        <div v-show="bias.length+connections.length+hiddenNeurons.length+body.length>0">
+          <input type="button" value="Test Me" @click="testRobot">
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -97,6 +144,7 @@ export default {
   },
   data () {
     return {
+      selectedRobotFile: '',
       name: 'NewRobot',
       saved: true,
       body: '',
@@ -113,19 +161,20 @@ export default {
     // Load file
     open_file: function () {
       console.log(this.projectFolderPath)
-      dialog.showOpenDialog({
-        filters: [
-          { name: 'Robogen Robot File', extensions: ['robot.txt'] }
-        ],
-        defaultPath: this.projectFolderPath
-      }, (fileNames) => {
-        // fileNames is an array that contains all the selected
-        if (fileNames === undefined) {
-          console.log('No file selected')
-          return
+      dialog.showOpenDialog(
+        {
+          filters: [{ name: 'Robogen Robot File', extensions: ['robot.txt'] }],
+          defaultPath: this.projectFolderPath
+        },
+        fileNames => {
+          // fileNames is an array that contains all the selected
+          if (fileNames === undefined) {
+            console.log('No file selected')
+            return
+          }
+          this.load_file(fileNames[0])
         }
-        this.load_file(fileNames[0])
-      })
+      )
     },
     // Load specific file
     load_file: function (fileName) {
@@ -137,7 +186,10 @@ export default {
 
         // Update file name
         this.filepath = fileName
-        this.name = fileName.substring(fileName.lastIndexOf('/') + 1, fileName.indexOf('.'))
+        this.name = fileName.substring(
+          fileName.lastIndexOf('/') + 1,
+          fileName.indexOf('.')
+        )
 
         // Change how to handle the file content
         var robot
@@ -147,15 +199,19 @@ export default {
         for (var i = 0; i < robot.length; i++) {
           if (robot[i].indexOf('\n\n') === 0) {
             finalRobot.push('')
-            finalRobot.push('')// Add two empty elements instead of one
+            finalRobot.push('') // Add two empty elements instead of one
             finalRobot.push(robot[i].substring(2, robot[i].lastIndexOf('\n')))
           } else {
-            finalRobot.push(robot[i].substring(0, robot[i].lastIndexOf('\n') - 1))
+            finalRobot.push(
+              robot[i].substring(0, robot[i].lastIndexOf('\n') - 1)
+            )
           }
         }
         this.body = typeof finalRobot[0] === 'undefined' ? '' : finalRobot[0]
-        this.hiddenNeurons = typeof finalRobot[1] === 'undefined' ? '' : finalRobot[1]
-        this.connections = typeof finalRobot[2] === 'undefined' ? '' : finalRobot[2]
+        this.hiddenNeurons =
+          typeof finalRobot[1] === 'undefined' ? '' : finalRobot[1]
+        this.connections =
+          typeof finalRobot[2] === 'undefined' ? '' : finalRobot[2]
         this.bias = typeof finalRobot[3] === 'undefined' ? '' : finalRobot[3]
       })
       this.robotFile = fileName
@@ -166,39 +222,43 @@ export default {
       var content = ''
       // body
       if (this.body.length > 0) {
-        if (this.body.charAt(this.body.length - 1) !== '\n') { // chek if last element is new line
+        if (this.body.charAt(this.body.length - 1) !== '\n') {
+          // chek if last element is new line
           this.body += '\n'
         }
         content += this.body
       }
-      content += '\n'// empty line after body
+      content += '\n' // empty line after body
 
       // hiddenNeurons
       if (this.hiddenNeurons.length > 0) {
-        if (this.hiddenNeurons.charAt(this.hiddenNeurons.length - 1) !== '\n') { // chek if last element is new line
+        if (this.hiddenNeurons.charAt(this.hiddenNeurons.length - 1) !== '\n') {
+          // chek if last element is new line
           this.hiddenNeurons += '\n'
         }
         content += this.hiddenNeurons
       }
-      content += '\n'// empty line after hiddenNeurons
+      content += '\n' // empty line after hiddenNeurons
 
       // connections
       if (this.connections.length > 0) {
-        if (this.connections.charAt(this.connections.length - 1) === '\n') { // chek if last element is new line
+        if (this.connections.charAt(this.connections.length - 1) === '\n') {
+          // chek if last element is new line
           this.connections += '\n'
         }
         content += this.connections
       }
-      content += '\n'// empty line after connections
+      content += '\n' // empty line after connections
 
       // bias
       if (this.bias.length > 0) {
-        if (this.bias.charAt(this.bias.length - 1) === '\n') { // chek if last element is new line
+        if (this.bias.charAt(this.bias.length - 1) === '\n') {
+          // chek if last element is new line
           this.bias += '\n'
         }
         content += this.bias
       }
-      content += '\n'// empty line after connections
+      content += '\n' // empty line after connections
 
       return content
     },
@@ -207,27 +267,33 @@ export default {
       console.log(this.projectFolderPath)
       var content = this.get_content()
       // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
-      dialog.showSaveDialog({
-        defaultPath: this.projectFolderPath + '/' + this.name + '.robot.txt',
-        filters: [
-          { name: 'Robogen Robot File', extensions: ['robot.txt'] }
-        ]}, (fileName) => {
-        if (fileName === undefined) {
-          console.log("You didn't save the file")
-          return
-        }
+      if (this.selectedRobotFile === 'NewRobot') {
+        dialog.showSaveDialog(
+          {
+            defaultPath:
+              this.projectFolderPath + '/' + this.name + '.robot.txt',
+            filters: [{ name: 'Robogen Robot File', extensions: ['robot.txt'] }]
+          },
+          fileName => {
+            if (fileName === undefined) {
+              console.log("You didn't save the file")
+              return
+            }
+            this.writeToFile(fileName, content)
+          }
+        )
+      } else {
+        var fileName = this.projectFolderPath + '/' + this.name + '.robot.txt'
         this.writeToFile(fileName, content)
-      })
+      }
     },
     writeToFile: function (fileName, content) {
       // fileName is a string that contains the path and filename created in the save file dialog.
-      fs.writeFile(fileName, content, (err) => {
+      fs.writeFile(fileName, content, err => {
         if (err) {
           alert('An error ocurred creating the file ' + err.message)
         }
         this.filepath = fileName
-        alert('The file has been succesfully saved')
-        console.log('saved')
         this.saved = true
       })
       // console.log(success)
@@ -239,41 +305,42 @@ export default {
     },
     testRobot: function () {
       var self = this
-      if (this.saved) {
-        var robFile = self.filepath.substring(
-          self.filepath.indexOf('examples') + 9,
-          self.filepath.length
-        )
-        var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'), [robFile, 'conf.txt'])
-
-        ls.stdout.on('data', function (data) {
-          console.log('stdout: <' + data + '> ')
-        })
-
-        ls.stderr.on('data', function (data) {
-          console.log('stderr: ' + data)
-        })
-
-        ls.on('close', function (code) {
-          console.log('child process exited with code ' + code)
-          // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
-          // getDroidOutput().style.background = 'DarkGray'
-        })
-      } else {
+      if (!this.saved) {
         self.save_file()
-        if (self.saved) {
-          self.testRobot()
-        }
       }
+      var robFile = self.filepath.substring(
+        self.filepath.indexOf('examples') + 9,
+        self.filepath.length
+      )
+      var ls = childProcess.execFile(
+        path.join(__static, 'scripts', 'sim', 'sim.sh'),
+        [robFile, 'conf.txt']
+      )
+
+      ls.stdout.on('data', function (data) {
+        console.log('stdout: <' + data + '> ')
+      })
+
+      ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data)
+      })
+
+      ls.on('close', function (code) {
+        console.log('child process exited with code ' + code)
+        // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
+        // getDroidOutput().style.background = 'DarkGray'
+      })
     },
     saveFromParrent () {
       if (this.saved) {
         return true
       } else {
-        var result = dialog.showMessageBox({ title: 'Save Changes',
+        var result = dialog.showMessageBox({
+          title: 'Save Changes',
           message: 'Do you want to save the new changes in robot file?',
           buttons: ['Yes', 'No'],
-          cancelId: 1 })
+          cancelId: 1
+        })
         if (result === 0) {
           // Save file
           this.save_file()
@@ -292,7 +359,8 @@ export default {
 
       this[model] = `${textStart}\t${textEnd}`
       event.target.value = this[model] // required to make the cursor stay in place.
-      event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
+      event.target.selectionEnd = event.target.selectionStart =
+        originalSelectionStart + 1
     },
     enter (event, model) {
       var text, originalSelectionStart, textStart, textEnd
@@ -301,38 +369,57 @@ export default {
       textStart = text.slice(0, originalSelectionStart)
       textEnd = text.slice(originalSelectionStart)
 
-      if (textStart.charAt(textStart.length - 1) === '\n' || textEnd.charAt(0) === '\n') {
+      if (
+        textStart.charAt(textStart.length - 1) === '\n' ||
+        textEnd.charAt(0) === '\n'
+      ) {
         // do nothing
       } else {
         this[model] = `${textStart}\n${textEnd}`
         event.target.value = this[model] // required to make the cursor stay in place.
-        event.target.selectionEnd = event.target.selectionStart = originalSelectionStart + 1
+        event.target.selectionEnd = event.target.selectionStart =
+          originalSelectionStart + 1
       }
     }
   },
   computed: {
     saveCheck: function () {
       var temp = this.body + this.hiddenNeurons + this.connections + this.bias
-      if (temp !== '') { // if the file is empty lets cosider to be saved
+      if (temp !== '') {
+        // if the file is empty lets cosider to be saved
         this.saved = false
       }
     },
     update: function () {
       if (this.robotFiles.length > 0) {
-        this.load_file(this.projectFolderPath + '/' + this.robotFiles[0])
+        if (this.selectedRobotFile === '') {
+          this.selectedRobotFile = this.robotFiles[0]
+          this.load_file(this.projectFolderPath + '/' + this.robotFiles[0])
+          this.saved = true
+        } else if (this.selectedRobotFile !== 'NewRobot') {
+          this.load_file(this.projectFolderPath + '/' + this.selectedRobotFile)
+          this.saved = true
+        } else {
+          this.name = 'NewRobot'
+          this.saved = true
+          this.body = ''
+          this.hiddenNeurons = ''
+          this.connections = ''
+          this.bias = ''
+          this.localProjectFolderPath = this.projectFolderPath
+          this.localRobotFiles = this.robotFiles
+        }
         console.log(this.mainFolderPath)
         this.saved = true
       } else {
-        this.$data = {
-          name: 'NewRobot',
-          saved: true,
-          body: '',
-          hiddenNeurons: '',
-          connections: '',
-          bias: '',
-          localProjectFolderPath: this.projectFolderPath,
-          localRobotFiles: this.robotFiles
-        }
+        this.name = 'NewRobot'
+        this.saved = true
+        this.body = ''
+        this.hiddenNeurons = ''
+        this.connections = ''
+        this.bias = ''
+        this.localProjectFolderPath = this.projectFolderPath
+        this.localRobotFiles = this.robotFiles
       }
     }
   },
@@ -346,8 +433,6 @@ export default {
 
 <style>
 @import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:300,400");
-
-
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -372,8 +457,8 @@ a {
   text-decoration: none;
 }
 
-.head{
-    font-size: 20px;
+.head {
+  font-size: 20px;
 }
 
 header {
@@ -403,7 +488,7 @@ header h1 {
 .vue-form legend {
   padding-bottom: 10px;
   border-bottom: 1px solid #ecf0f1;
-  display: inline-block
+  display: inline-block;
 }
 
 .vue-form h4,
@@ -581,7 +666,7 @@ header h1 {
 input[type="button"] {
   display: inline-block;
   border: none;
-  background: #3498DB;
+  background: #3498db;
   border-radius: 0.25em;
   padding: 6px 10px;
   color: #ffffff;
@@ -604,9 +689,8 @@ input[type="button"]:active {
 }
 
 input:disabled {
-    background: #c7c7c7!important;
+  background: #c7c7c7 !important;
 }
-
 
 .vue-form .error-message {
   height: 35px;
@@ -657,18 +741,18 @@ input:disabled {
   tab-size: 2;
 }
 
-.title-box{
-    background-color: rgba(0, 0, 0, 0.9);
-    box-shadow: 0 1px 10px 1px rgba(0, 0, 0, 0.3);
-    border-radius: 5px; 
-    margin-top: -6px;
+.title-box {
+  background-color: rgba(0, 0, 0, 0.9);
+  box-shadow: 0 1px 10px 1px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  margin-top: -6px;
 }
 
-.title{
-    font-family: "Source Code Pro", monospace;
-    color: white;
-    padding: 5px 11px;
-    font-size: 20px;
+.title {
+  font-family: "Source Code Pro", monospace;
+  color: white;
+  padding: 5px 11px;
+  font-size: 20px;
 }
 /* .subtitle-box{
     margin: -6px 0px 15px 0px;
@@ -677,13 +761,13 @@ input:disabled {
     border-radius: 5px; 
 } */
 
-.subtitle{
-    margin-top: 5px;
-    font-family: "Source Code Pro", monospace;
-    color: rgb(82, 156, 230);
-    font-weight: 800;
-    padding: 0px 20px;
-    font-size: 17px;
+.subtitle {
+  margin-top: 5px;
+  font-family: "Source Code Pro", monospace;
+  color: rgb(82, 156, 230);
+  font-weight: 800;
+  padding: 0px 20px;
+  font-size: 17px;
 }
 
 @-webkit-keyframes cd-bounce {
