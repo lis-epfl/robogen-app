@@ -315,9 +315,9 @@ export default {
       }
     },
     runTest: function () {
-      var robFile = self.filepath.substring(
-        self.filepath.indexOf('examples') + 9,
-        self.filepath.length
+      var robFile = this.filepath.substring(
+        this.filepath.indexOf('examples') + 9,
+        this.filepath.length
       )
       var ls = childProcess.execFile(
         path.join(__static, 'scripts', 'sim', 'sim.sh'),

@@ -122,7 +122,21 @@
           </b-card-header>
           <b-collapse id="accordion1" visible accordion="my-accordion" role="tabpanel">
             <b-card-body>
-              <div class="row">body</div>
+              <div class="row">
+                <label class="label" for="textarea">Output Folder</label>
+                <input type="text" name="outfolder" id="outfolder" disabled :value="projectFolderPath+'/output'">
+              </div>
+               
+              <div class="row mt-3">
+        <div style="width:100%">
+          <input
+            type="button"
+            value="Generate Output"
+            :disabled="!isValid"
+            @click="outSim"
+          >
+        </div>
+      </div>
             </b-card-body>
           </b-collapse>
         </b-card>
@@ -171,6 +185,7 @@ export default {
       saved: false,
       name: '',
       selectedSimFile: '',
+      generateHardwareFiles: false,
       localProjectFolderPath: this.projectFolderPath,
       localSimFiles: this.simFiles,
       localRobotFiles: this.robotFiles,
@@ -301,8 +316,12 @@ export default {
       if (!this.saved) {
         this.save_sim_file(true)
       } else {
-        self.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
+        this.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
       }
+    },
+    outSim: function () {
+      this.generateHardwareFiles = true
+      this.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
     },
     simulate (mainFolderPath, simFilePath, robotFile) {
       if (
@@ -326,10 +345,27 @@ export default {
         robotFile.length
       )
 
-      var ls = childProcess.execFile(
-        path.join(__static, 'scripts', 'sim', 'sim.sh'),
-        [robFile, file]
+      var relativeProjectFolder = this.projectFolderPath.substring(
+        robotFile.indexOf('examples') + 9,
+        robotFile.length
       )
+
+      var ls
+
+      if (this.generateHardwareFiles === true) {
+        console.log('Generate hardware')
+        ls = childProcess.execFile(
+          path.join(__static, 'scripts', 'sim', 'out.sh'),
+          [robFile, file, relativeProjectFolder + '/ouput']
+        )
+        this.generateHardwareFiles = false
+      } else {
+        console.log('Generate hardware')
+        ls = childProcess.execFile(
+          path.join(__static, 'scripts', 'sim', 'sim.sh'),
+          [robFile, file]
+        )
+      }
 
       ls.stdout.on('data', function (data) {
         console.log('stdout: <' + data + '> ')
