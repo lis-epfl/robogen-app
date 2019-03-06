@@ -167,28 +167,32 @@ if (process.env.NODE_ENV === 'production') {
       buildFiles: [
       //SIM
       {
-        path: path.resolve(__dirname, '../dist/electron/static/scripts/sim/simCheck.sh'),
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'sim', 'simCheck.sh'),
         fileMode: '555'
       },
       {
-        path: path.resolve(__dirname, '../dist/electron/static/scripts/sim/start.sh'),
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'sim', 'start.sh'),
         fileMode: '555' 
       },
       {
-        path: path.resolve(__dirname, '../dist/electron/static/scripts/sim/sim.sh'),
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'sim', 'sim.sh'),
+        fileMode: '555' 
+      },
+      {
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'sim', 'out.sh'),
         fileMode: '555' 
       },
       //Evol
       {
-        path: path.resolve(__dirname, '../dist/electron/static/scripts/evol/evolCheck.sh'),
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'evol', 'evolCheck.sh'),
         fileMode: '555' 
       },
       {
-        path: path.resolve(__dirname, '../dist/electron/static/scripts/evol/start.sh'),
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'evol', 'start.sh'),
         fileMode: '555' 
       },
       {
-        path: path.resolve(__dirname, '../dist/electron/static/scripts/evol/evol.sh'),
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'evol', 'evol.sh'),
         fileMode: '555' 
       }
     ]}),
