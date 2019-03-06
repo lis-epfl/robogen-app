@@ -56,7 +56,16 @@ export default {
     },
     validateEvol: function () {
       var self = this
-      var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evolCheck.sh'))
+
+      var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evolCheck.sh'), (error, stdout, stderr) => {
+        if (error) {
+          // throw error
+          // do nothing
+        }
+        if (stdout.includes('good')) {
+          self.evolStatus = true
+        }
+      })
 
       ls.stdout.on('data', function (data) {
         if (data.includes('good')) {
@@ -67,8 +76,7 @@ export default {
       ls.stderr.on('data', function (data) {
         //
         self.evolStatus = false
-        if (data.includes('No such container: robogen')) {
-          // alert('Restart Evolve')
+        if (data.includes('No such container: robogen') || data.includes('is not running')) {
           self.activateEvol()
         } else {
           alert('stderr validateEvol: ' + data)
@@ -76,7 +84,7 @@ export default {
       })
 
       ls.on('close', function (code) {
-        if (code !== 0 && code !== 1 && code < 128) {
+        if (!(code === 0 || code === 1 || code === 126)) {
           alert('validateEvol process exited with code ' + code)
         }
       })
@@ -90,9 +98,12 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        alert('stderr activateSim: ' + data)
         if (data.includes('is already in use by container')) {
           self.validateSim()
+        } else if (data.includes('Bad substitution')) {
+          self.validateSim()
+        } else {
+          alert('stderr activateSim: ' + data)
         }
       })
 
@@ -108,8 +119,19 @@ export default {
     validateSim: function () {
       var self = this
 
-      var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'))
+      var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'), (error, stdout, stderr) => {
+        if (error) {
+          // throw error
+          // do nothing
+        }
+        if (stdout.includes('good')) {
+          self.simStatus = true
+        }
+      })
 
+      // var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'))
+
+      // console.dir(ls)
       ls.stdout.on('data', function (data) {
         if (data.includes('good')) {
           self.simStatus = true
@@ -117,8 +139,13 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        alert('stderr validateSim: ' + data)
         self.simStatus = false
+        if (data.includes('No such container: robogen')) {
+          // alert('Restart sim container')
+          self.activateSim()
+        } else {
+          alert('stderr validateSim: ' + data)
+        }
       })
 
       ls.on('close', function (code) {
@@ -131,13 +158,14 @@ export default {
     validate: function () {
       // Validation may take longer than expected time
       // Do not validate if evolution is in progress
+
       this.validateSim()
       this.validateEvol()
       setTimeout(this.validate, 5000)
     },
     execute: function () {}
   },
-  created () {
+  mounted () {
     this.validate()
     var self = this
     Event.$on('updateFiles', function () {
