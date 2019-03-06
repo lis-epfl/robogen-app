@@ -22,6 +22,7 @@ import 'echarts/lib/component/legend'
 import 'echarts/lib/component/axisPointer'
 import 'echarts/lib/component/title'
 import 'echarts/lib/component/toolbox'
+import { remote } from 'electron'
 
 Vue.use(BootstrapVue)
 Vue.component('v-chart', ECharts)
@@ -36,6 +37,14 @@ Vue.component('font-awesome-icon', FontAwesomeIcon)
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
+
+remote.globalShortcut.register('CommandOrControl+Shift+K', () => {
+  remote.BrowserWindow.getFocusedWindow().webContents.openDevTools()
+})
+
+window.addEventListener('beforeunload', () => {
+  remote.globalShortcut.unregisterAll()
+})
 
 window.Event = new Vue()
 
