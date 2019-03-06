@@ -7,7 +7,6 @@ const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 const AddPermissionsPlugin = require('webpack-permissions-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -110,6 +109,7 @@ let rendererConfig = {
     __filename: process.env.NODE_ENV !== 'production'
   },
   plugins: [
+    new webpack.optimize.OccurrenceOrderPlugin(true),
     new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin({
       filename: 'index.html',
@@ -121,7 +121,8 @@ let rendererConfig = {
       },
       nodeModules: process.env.NODE_ENV !== 'production'
         ? path.resolve(__dirname, '../node_modules')
-        : false
+        : false,
+      chunksSortMode: 'none'
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
@@ -160,13 +161,7 @@ if (process.env.NODE_ENV === 'production') {
 
   rendererConfig.plugins.push(
     new BabiliWebpackPlugin(),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, '..','static'),
-        to: path.join(__dirname, '../dist/electron/static'),
-        ignore: ['.*']
-      }
-    ]),
+    
     new AddPermissionsPlugin({
       //Give executable rights for the script files
       buildFiles: [
