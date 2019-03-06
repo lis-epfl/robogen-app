@@ -1,6 +1,6 @@
 {
-  "name": "robogen-app",
-  "version": "0.0.0",
+  "name": "Robogen",
+  "version": "2.0.0",
   "author": "Anand B <banand@live.com>",
   "description": "An frontend app for robogen",
   "license": null,
@@ -22,7 +22,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "robogen-app",
+    "productName": "Robogen",
     "appId": "org.lis.erobogen",
     "directories": {
       "output": "build"
