@@ -4,14 +4,14 @@
             <div class="home-main-title">Project Configuration</div>
             <div class="vue-form">
             <div>
-                <label class="label">Main Folder</label>
-                <folder-select v-model="mainFolderPath"></folder-select>
+                <label class="label">Main Folder: &nbsp;</label>
+                <folder-select v-model="mainFolderPath" :disabled="true"></folder-select>
                 <p class="errormsg" v-if="validateMainFolder()">{{validateMainFolder()}}</p>
                 <!-- <a class="gernerate-dir">TODO: Generate Directories for Robogen 2019</a> -->
             </div>
 
             <div>
-                <label class="label">Project Folder</label>
+                <label class="label">Project Folder: &nbsp;</label>
                 <folder-select v-model="projectFolderPath" :defaultPath=mainFolderPath></folder-select>
                 <p class="errormsg" v-if="validateProjectFolder()">{{validateProjectFolder()}}</p>
                 <div v-if="validateProjectFolder()==='' && validateMainFolder()===''" style="margin-left:20px;margin-top:10px">
@@ -25,6 +25,11 @@
                 </div>
             </div>
 
+            </div>
+            <div>
+              <p style="color: rgba(128, 128, 128, 0.66);font-weight: bold;">
+              Build number: <i> 2.0.0-beta </i>
+              </p>
             </div>
             
           </div>
@@ -43,7 +48,9 @@
 
             <div class="row">
               <div class="home-title alt">Other Documentation</div>
+              <br>
               <button class="alt" @click="open('http://robogen.org/docs/evolution-configuration/')">Robogen Parameters</button>
+              <br>
               <button class="alt" @click="open('http://robogen.org/docs/custom-scenarios/')">Scenarios</button>
             </div>
           </div>
@@ -51,6 +58,7 @@
 </template>
 <script>
 import FolderSelect from './Helper/FolderSelect.vue'
+const os = require('os')
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
 
 export default {
@@ -59,7 +67,7 @@ export default {
   },
   data () {
     return {
-      mainFolderPath: '',
+      mainFolderPath: '/home/' + os.userInfo().username + '/Robogen/examples',
       projectFolderPath: '',
       errorProjectFolderPath: '',
       robotFiles: '',
@@ -107,7 +115,6 @@ export default {
       this.$parent.fileUpdate(this.mainFolderPath, this.projectFolderPath, this.robotFiles, this.simFiles, this.evolFiles, this.resultFolders)
     },
     isDirectory (filepath, filename) {
-      console.log(filename.includes('.'))
       if (filename.includes('.')) {
         return false
       } else {
@@ -165,7 +172,6 @@ export default {
   created () {
     var self = this
     Event.$on('updateFiles', function () {
-      console.log(self.projectFolderPath)
       self.updateFiles(self.projectFolderPath)
     })
   }

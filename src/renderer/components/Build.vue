@@ -417,7 +417,6 @@ export default {
           this.localProjectFolderPath = this.projectFolderPath
           this.localRobotFiles = this.robotFiles
         }
-        console.log(this.mainFolderPath)
         this.saved = true
       } else {
         this.name = 'NewRobot'

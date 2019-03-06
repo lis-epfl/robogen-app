@@ -104,7 +104,7 @@
         <div style="width:100%">
           <input
             type="button"
-            value="Test Simulation Settings"
+            value="Simulate Robot"
             :disabled="!isValid"
             @click="testSim"
           >
@@ -328,10 +328,14 @@ export default {
         !simFilePath.includes('examples') ||
         !robotFile.includes('examples')
       ) {
-        alert(
-          'Only the files in the example folder can used. Current filepath = ' +
-            mainFolderPath + ' , ' + simFilePath + ' , ' + robotFile
-        )
+        if (this.generateHardwareFiles) {
+          alert('Simulate your robot before generating output')
+        } else {
+          alert(
+            'Only the files in the example folder can used. Current filepath = ' +
+              mainFolderPath + ' , ' + simFilePath + ' , ' + robotFile
+          )
+        }
         return
       }
 
@@ -356,7 +360,7 @@ export default {
         console.log('Generate hardware')
         ls = childProcess.execFile(
           path.join(__static, 'scripts', 'sim', 'out.sh'),
-          [robFile, file, relativeProjectFolder + '/ouput']
+          [robFile, file, relativeProjectFolder + '/output']
         )
         this.generateHardwareFiles = false
       } else {
@@ -423,7 +427,6 @@ export default {
       if (this.simFiles.length > 0) {
         this.load_sim_file(this.projectFolderPath + '/' + this.simFiles[0])
         this.selectedSimFile = this.simFiles[0]
-        console.log(this.mainFolderPath)
       } else {
         this.simulationTime = 8
         this.timeStep = 0.005

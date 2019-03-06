@@ -561,38 +561,35 @@ export default {
         this.$refs.robotFile.updateFilePath('')
         this.load_evol_file(this.projectFolderPath + '/' + this.evolFiles[0])
         this.selectedEvolFile = this.evolFiles[0]
-        console.log(this.mainFolderPath)
       } else {
-        this.$data = {
-          name: '',
-          evolutionMode: 'brain',
-          numGenerations: 40,
-          mu: 20,
-          lambda: 20,
-          replacement: 'plus',
-          selection: 'deterministic-tournament',
-          tournamentSize: 2,
-          pBrainMutate: 0.5,
-          pBrainCrossover: 0,
-          pAddHiddenNeuron: 0,
-          pOscillatorNeuron: 0,
-          numInitialParts: '2:10',
-          addBodyPart: 'All',
-          maxBodyParts: '20',
-          other: '',
-          simFile: '',
-          robotFile: '',
-          content: '',
-          saved: false,
-          filepath: '',
-          cpuCount: 1,
-          referenceRobotFile: '',
-          localProjectFolderPath: this.projectFolderPath,
-          localSimFiles: this.simFiles,
-          localEvolFiles: this.evolFiles,
-          localRobotFiles: this.robotFiles,
-          localMainFolerPath: this.mainFolderPath
-        }
+        this.name = ''
+        this.evolutionMode = 'brain'
+        this.numGenerations = 40
+        this.mu = 20
+        this.lambda = 20
+        this.replacement = 'plus'
+        this.selection = 'deterministic-tournament'
+        this.tournamentSize = 2
+        this.pBrainMutate = 0.5
+        this.pBrainCrossover = 0
+        this.pAddHiddenNeuron = 0
+        this.pOscillatorNeuron = 0
+        this.numInitialParts = '2:10'
+        this.addBodyPart = 'All'
+        this.maxBodyParts = '20'
+        this.other = ''
+        this.simFile = ''
+        this.robotFile = ''
+        this.content = ''
+        this.saved = false
+        this.filepath = ''
+        this.cpuCount = 1
+        this.referenceRobotFile = ''
+        this.localProjectFolderPath = this.projectFolderPath
+        this.localSimFiles = this.simFiles
+        this.localEvolFiles = this.evolFiles
+        this.localRobotFiles = this.robotFiles
+        this.localMainFolerPath = this.mainFolderPath
       }
       this.saved = true
     }
