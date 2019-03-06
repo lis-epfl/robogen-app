@@ -20,14 +20,14 @@
       <b-tabs v-model="tabIndex">
         <b-tab title="Past Evolutions">
 
-          <div v-if="resultFolders.length==0" style="text-align:center">
+          <div v-if="actualResultFolders.length==0" style="text-align:center">
             <p>No Past evoltions found.</p>
           </div>
           <div v-else>
-
+          <br>
           <b-form-select v-model="selectedFolder" class="mb-3">
             <option :value="null" disabled>-- Please select an pre-evolved folder --</option>
-            <option v-for="folder in resultFolders" :key="folder" :title="folder" :value="folder">{{folder}}</option>
+            <option v-for="folder in actualResultFolders" :key="folder" :title="folder" :value="folder">{{folder}}</option>
           </b-form-select>
           <div v-if="selectedFolder!=''">
             <br>
@@ -102,6 +102,10 @@
 
         <b-tab title="Ongoing Evolution" key="Ongoing Evolution"  >
             <br>
+            <div v-if="!ongoingEvolution" style="text-align:center">
+              <p> No ongoing evolution</p>
+            </div>
+            <div v-else>
             <div style="width:100%">
             <v-chart :options="options" :autoResize="true"/>
             </div>
@@ -172,6 +176,7 @@
                 <span v-else>{{data.item.std}}</span>
               </template>
             </b-table>
+            </div>
         </b-tab>
       </b-tabs>
     </fieldset>
@@ -435,7 +440,7 @@ export default {
       }
       return tooltip + 'G' + generation + ' (I' + (index + 1) + ') : ' + fitnessValue
     },
-    getOnGoingEvolFolder () {
+    getLatestEvolFolder () {
       var files = fs.readdirSync(this.projectFolderPath)
       var latest = 0
       for (var i = 0; i < files.length; i++) {
@@ -446,7 +451,7 @@ export default {
         }
       }
       console.log(latest + 'is latest')
-      var folder = this.projectFolderPath + '/evol_results'
+      var folder = 'evol_results'
       if (latest !== 0) {
         folder += '_' + latest
       }
@@ -456,7 +461,7 @@ export default {
       var individual = index + 1 // Update by one for individual
       var folder = ''
       if (ongoingEvolution) {
-        folder = this.getOnGoingEvolFolder()
+        folder = this.projectFolderPath + '/' + this.getLatestEvolFolder()
       } else {
         folder = this.projectFolderPath + '/' + this.selectedFolder
       }
@@ -717,6 +722,9 @@ export default {
   computed: {
     update () {
       console.log('Update needed')
+    },
+    actualResultFolders () {
+      return this.resultFolders.filter(resultFolder => !resultFolder.includes('output'))
     }
   },
   watch: {
@@ -725,6 +733,8 @@ export default {
     update () {},
     resultFolders: function () {
       this.ongoingEvolution = false
+      this.tabIndex = 0
+      this.selectedFolder = this.getLatestEvolFolder()
     },
     selectedFolder () {
       this.loadResults(this.projectFolderPath, this.selectedFolder)
@@ -740,24 +750,23 @@ export default {
     })
 
     Event.$on('endEvol', function (code) {
-      if (code !== 0) {
+      if (!(code === 0 || code === 137)) {
         alert('Evolution ended with code ' + code)
       }
-      var filename = self.getOnGoingEvolFolder() + '/evolution.json'
+      var filename = self.projectFolderPath + '/' + self.getLatestEvolFolder() + '/evolution.json'
       fs.writeFile(filename, JSON.stringify(self.evolution), function (err) {
         if (err) {
           return console.log(err)
         }
-        console.log('The file was saved!')
         Event.$emit('updateFiles')
       })
     })
 
     Event.$on('newEvol', function (_maxGenerations) {
       self.maxGenerations = parseInt(_maxGenerations)
-      console.log('New Evolution Initialized')
-      self.tabIndex = 1
+      console.log('New Evolution Initialized. max generation=' + self.maxGenerations)
       self.ongoingEvolution = true
+      self.tabIndex = 1
       self.evolution = [{'generation': 1, 'best': -1000000, 'avg': -1000000, 'std': -1000000, 'fitness': []}]
       self.population = 0
       self.maxFintess = 0
