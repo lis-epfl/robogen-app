@@ -1,18 +1,32 @@
 <template>
     <div>
     <div class="settings" @click="openHome">
-          <font-awesome-icon icon="home" class="settings-icon" />
+        <font-awesome-icon v-if="!downloading" icon="home" class="settings-icon" />
+        <font-awesome-icon v-else icon="spinner" spin class="settings-icon" />
         </div>
         <div class="status">
+          <div v-if="!downloading">
             <div><p class="head">Simulator: </p>
               <p v-if="simStatus" class="success">Active</p>
-              <p v-else class="state" @click="activateSim">Activate</p>
+              <p v-else class="state" @click="activateSim">Activate {{downloading}}</p>
             </div>
 
             <div><p class="head">Evolver: </p>
               <p v-if="evolStatus" class="success">Active</p>
-              <p v-else class="state" @click="activateEvol">Activate</p>
+              <p v-else class="state" @click="activateEvol">Activate {{downloading}} </p>
             </div>
+          </div>
+          <div v-else>
+            <div>
+              <p class="head">Status : </p>
+              <p class="success">Downlading</p>
+            </div>
+            <div><p class="head">Note: </p>
+              <p>First usage of this app will take about 5 minuites</p>
+            </div>
+
+          </div>
+
           </div>
           </div>
 </template>
@@ -25,7 +39,8 @@ export default {
     return {
       name: 'NewRobot',
       simStatus: false,
-      evolStatus: false
+      evolStatus: false,
+      downloading: false
     }
   },
   methods: {
@@ -34,139 +49,164 @@ export default {
     },
     activateEvol: function () {
       // var ls = childProcess.spawn('ls', ['-l']);
-      var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'start.sh'))
-      var self = this
-      ls.stdout.on('data', function (data) {
-        console.log('stdout: <' + data + '> ')
-      })
 
-      ls.stderr.on('data', function (data) {
-        if (data.includes('is already in use by container')) {
-          self.validateEvol()
-        } else {
-          alert('stderr activateEvol: ' + data)
-        }
-      })
+      if (!this.downloading) {
+        var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'start.sh'))
+        var self = this
+        ls.stdout.on('data', function (data) {
+          console.log('stdout: <' + data + '> ')
+        })
 
-      ls.on('close', function (code) {
-        if (code !== 0 && code !== 125) {
-          alert('activateEvol process exited with code ' + code)
-        }
-      })
+        ls.stderr.on('data', function (data) {
+          if (data.includes('is already in use by container')) {
+            self.validateEvol()
+          } else if (!self.checkDownload(data)) {
+            alert('stderr activateEvol: ' + data)
+          }
+        })
+
+        ls.on('close', function (code) {
+          if (code !== 0 && code !== 125) {
+            alert('activateEvol process exited with code ' + code)
+          }
+        })
+      } else {
+        console.log('activateEvol paused because of download')
+      }
     },
     validateEvol: function () {
       var self = this
 
-      var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evolCheck.sh'), (error, stdout, stderr) => {
-        if (error) {
+      if (!this.downloading) {
+        var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evolCheck.sh'), (error, stdout, stderr) => {
+          if (error) {
           // throw error
           // do nothing
-        }
-        if (stdout.includes('good')) {
-          self.evolStatus = true
-        }
-      })
+          }
+          if (stdout.includes('good')) {
+            self.evolStatus = true
+          }
+        })
 
-      ls.stdout.on('data', function (data) {
-        if (data.includes('good')) {
-          self.evolStatus = true
-        }
-      })
+        ls.stdout.on('data', function (data) {
+          if (data.includes('good')) {
+            self.evolStatus = true
+          }
+        })
 
-      ls.stderr.on('data', function (data) {
+        ls.stderr.on('data', function (data) {
         //
-        self.evolStatus = false
-        if (data.includes('No such container: robogen') || data.includes('is not running')) {
-          self.activateEvol()
-        } else {
-          alert('stderr validateEvol: ' + data)
-        }
-      })
+          self.evolStatus = false
+          if (data.includes('No such container: robogen') || data.includes('is not running')) {
+            self.activateEvol()
+          } else if (!self.checkDownload(data)) {
+            alert('stderr validateEvol: ' + data)
+          }
+        })
 
-      ls.on('close', function (code) {
-        if (!(code === 0 || code === 1 || code === 126)) {
-          alert('validateEvol process exited with code ' + code)
-        }
-      })
+        ls.on('close', function (code) {
+          if (!(code === 0 || code === 1 || code === 126)) {
+            alert('validateEvol process exited with code ' + code)
+          }
+        })
+      }
     },
 
     activateSim: function () {
-      var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'start.sh'))
-      var self = this
-      ls.stdout.on('data', function (data) {
-        console.log('stdout: <' + data + '> ')
-      })
+      if (!this.downloading) {
+        var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'start.sh'))
 
-      ls.stderr.on('data', function (data) {
-        if (data.includes('is already in use by container')) {
-          self.validateSim()
-        } else if (data.includes('Bad substitution')) {
-          self.validateSim()
-        } else {
-          alert('stderr activateSim: ' + data)
-        }
-      })
+        var self = this
+        ls.stdout.on('data', function (data) {
+          console.log('stdout: <' + data + '> ')
+        })
 
-      ls.on('close', function (code) {
-        if (code !== 0) {
-          alert('activatesim process exited with code ' + code)
-        }
-        self.validateSim()
+        ls.stderr.on('data', function (data) {
+          if (data.includes('is already in use by container')) {
+            self.validateSim()
+          } else if (data.includes('Bad substitution')) {
+            self.validateSim()
+          } else if (!self.checkDownload(data)) {
+            alert('stderr activateSim: ' + data)
+          }
+        })
+
+        ls.on('close', function (code) {
+          if (!(code === 0 || code === 125)) {
+            alert('activatesim process exited with code ' + code)
+          }
+          self.validateSim()
         // if (code == 0) { setStatus('child process complete.') } else { setStatus('child process exited with code ' + code) }
         // getDroidOutput().style.background = 'DarkGray'
-      })
+        })
+      } else {
+        console.log('activateSim paused for download')
+      }
     },
     validateSim: function () {
       var self = this
-
-      var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'), (error, stdout, stderr) => {
-        if (error) {
+      if (!this.downloading) {
+        var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'), (error, stdout, stderr) => {
+          if (error) {
           // throw error
           // do nothing
-        }
-        if (stdout.includes('good')) {
-          self.simStatus = true
-        }
-      })
+          }
+          if (stdout.includes('good')) {
+            self.simStatus = true
+          }
+        })
+        // console.dir(ls)
+        ls.stdout.on('data', function (data) {
+          if (data.includes('good')) {
+            self.simStatus = true
+          }
+        })
 
-      // var ls = childProcess.execFile(path.join(__static, 'scripts', 'sim', 'simCheck.sh'))
-
-      // console.dir(ls)
-      ls.stdout.on('data', function (data) {
-        if (data.includes('good')) {
-          self.simStatus = true
-        }
-      })
-
-      ls.stderr.on('data', function (data) {
-        self.simStatus = false
-        if (data.includes('No such container: robogen')) {
+        ls.stderr.on('data', function (data) {
+          self.simStatus = false
+          if (data.includes('No such container: robogen')) {
           // alert('Restart sim container')
-          self.activateSim()
-        } else {
-          alert('stderr validateSim: ' + data)
+            self.activateSim()
+          } else if (!self.checkDownload(data)) {
+            alert('stderr validateSim: ' + data)
+          }
         }
-      })
+        )
 
-      ls.on('close', function (code) {
+        ls.on('close', function (code) {
         // alert('child process exited with code ' + code)
-        if (code !== 0) {
-          alert('validateSim process exited with code ' + code)
-        }
-      })
+          if (!(code === 0 || code === 1)) {
+            alert('validateSim process exited with code ' + code)
+          }
+        })
+      }
+    },
+    checkDownload: function (data) {
+      console.log(data)
+      if (data.includes('Pulling') || data.includes('Waiting') || data.includes(' Already exists') || data.includes('Unable to find image') || data.includes('Verifying Checksum') || data.includes('start.sh')) {
+        this.downloading = true
+        return true
+      } else if (data.includes('Downloaded newer image') || data.includes('Image is up to date')) {
+        this.downloading = false
+        this.validate()
+        return true
+      }
+      return this.downloading
     },
     validate: function () {
       // Validation may take longer than expected time
       // Do not validate if evolution is in progress
-
-      this.validateSim()
-      this.validateEvol()
-      setTimeout(this.validate, 5000)
+      if (!this.downloading) {
+        // do validation only on successful image
+        this.validateSim()
+        this.validateEvol()
+      }
     },
     execute: function () {}
   },
   mounted () {
     this.validate()
+    setTimeout(this.validate, 5000)
     var self = this
     Event.$on('updateFiles', function () {
       self.validateEvol()
