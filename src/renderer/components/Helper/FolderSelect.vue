@@ -1,11 +1,11 @@
 <template>
   <label class="file-select">
-    <div class="select-button" style="display:inline-block">
+    <div class="select-button" v-bind:class="{disabled: disabled}" style="display:inline-block">
       <span v-if="value">Selected Folder</span>
       <span v-else>Select Folder</span>
     </div>
       <span style="display:inline-block">{{value}}</span>
-    <input type="button" @click="get_folder"/>
+    <input type="button" @click="get_folder" :disabled="disabled==true"/>
   </label>
 </template>
 
@@ -18,6 +18,10 @@ export default {
     },
     defaultPath: {
       type: String
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -45,6 +49,18 @@ export default {
 </script>
 
 <style scoped>
+
+.file-select > .disabled {
+  background-color: rgb(175, 175, 175)!important;
+}
+
+.file-select > .disabled:hover {
+  outline: none;
+  background-color: rgb(175, 175, 175)!important;
+  border-color: rgb(175, 175, 175)!important;
+  box-shadow: 0 0 0px rgb(175, 175, 175)!important;
+}
+
 .file-select > .select-button {
   padding: 0.3rem;
 
