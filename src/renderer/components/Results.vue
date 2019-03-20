@@ -442,20 +442,25 @@ export default {
     },
     getLatestEvolFolder () {
       var files = fs.readdirSync(this.projectFolderPath)
-      var latest = 0
+      var latest = -1
       for (var i = 0; i < files.length; i++) {
+        if (files[i].includes('evol_results')) {
+          latest = 0
+        }
         if (files[i].includes('evol_results_')) {
           if (parseInt(files[i].substring('evol_results_'.length)) > latest) {
             latest = parseInt(files[i].substring('evol_results_'.length))
           }
         }
       }
-      console.log(latest + 'is latest')
-      var folder = 'evol_results'
-      if (latest !== 0) {
-        folder += '_' + latest
+
+      if (latest === 0) {
+        return 'evol_results'
+      } else if (latest > 0) {
+        return 'evol_results_' + latest
+      } else {
+        return null
       }
-      return folder
     },
     getVis (generation, index, fitnessValue, ongoingEvolution) {
       var individual = index + 1 // Update by one for individual
@@ -630,10 +635,13 @@ export default {
       console.log('Reupdating past evolution')
       // This will be executed on error
       // Load BestAvgStd.txt
+      if (resultFolder == null) {
+        return
+      }
       var fileName = projectFolderPath + '/' + resultFolder + '/BestAvgStd.txt'
       fs.readFile(fileName, 'utf-8', (err, data) => {
         if (err) {
-          alert('An error ocurred reading the file :' + err.message)
+          alert('An error ocurred reading the reupdate file :' + err.message)
           return
         }
         var values = data.split('\n').join(' ').split(' ')
@@ -676,12 +684,17 @@ export default {
       })
     },
     loadResults (projectFolderPath, resultFolder) {
+      if (resultFolder == null) {
+        console.log('Not returning')
+        return
+      }
+
       console.log('Load Results')
       // Check for Evolution.json
       var fileName = projectFolderPath + '/' + resultFolder + '/evolution.json'
       fs.readFile(fileName, 'utf-8', (err, data) => {
         if (err) {
-          alert('An error ocurred reading the file :' + err.message)
+          alert('An error ocurred reading the load result file :' + err.message)
           this.loadResultsTreditionally(projectFolderPath, resultFolder)
         }
 

@@ -21,6 +21,7 @@
                   <p><span class="file-type">Evolution File:</span> <span class="file-name">{{evolFiles}}</span></p>
                   <p><span class="file-type">Other File(s):</span> <span class="file-name">{{otherFiles}}</span></p>
                   <p><span class="file-type">Result Folder(s):</span> <span class="file-name">{{resultFolders}}</span></p>
+                  <p><span class="file-type">Output Folder(s):</span> <span class="file-name">{{outputFolders}}</span></p>
                   <p class="errormsg">{{errorProjectFiles}}</p>
                 </div>
             </div>
@@ -76,7 +77,8 @@ export default {
       evolFiles: '',
       otherFiles: [],
       errorProjectFiles: '',
-      resultFolders: []
+      resultFolders: [],
+      outputFolders: []
     }
   },
   methods: {
@@ -134,6 +136,7 @@ export default {
         this.scenarioFiles = []
         this.evolFiles = []
         this.resultFolders = []
+        this.outputFolders = []
         var files = fs.readdirSync(filepath)
         for (var i = 0; i < files.length; i++) {
           if (files[i].includes('.robot.txt')) {
@@ -145,7 +148,11 @@ export default {
           } else if (files[i].includes('.js')) {
             this.scenarioFiles.push(files[i])
           } else if (this.isDirectory(filepath, files[i])) {
-            this.resultFolders.push(files[i])
+            if (files[i].includes('output')) {
+              this.outputFolders.push(files[i])
+            } else {
+              this.resultFolders.push(files[i])
+            }
           } else {
             this.otherFiles.push(files[i])
           }

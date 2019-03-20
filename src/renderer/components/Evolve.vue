@@ -337,7 +337,7 @@ export default {
     load_evol_file: function (fileName) {
       fs.readFile(fileName, 'utf-8', (err, data) => {
         if (err) {
-          alert('An error ocurred reading the file :' + err.message)
+          alert('An error ocurred reading the file :' + fileName + err.message)
           return
         }
         this.name = fileName.substring(
