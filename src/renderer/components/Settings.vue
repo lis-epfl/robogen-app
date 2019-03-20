@@ -8,12 +8,12 @@
           <div v-if="!downloading">
             <div><p class="head">Simulator: </p>
               <p v-if="simStatus" class="success">Active</p>
-              <p v-else class="state" @click="activateSim">Activate {{downloading}}</p>
+              <p v-else class="state" @click="activateSim">Activate</p>
             </div>
 
             <div><p class="head">Evolver: </p>
               <p v-if="evolStatus" class="success">Active</p>
-              <p v-else class="state" @click="activateEvol">Activate {{downloading}} </p>
+              <p v-else class="state" @click="activateEvol">Activate</p>
             </div>
           </div>
           <div v-else>
@@ -55,6 +55,10 @@ export default {
         var self = this
         ls.stdout.on('data', function (data) {
           console.log('stdout: <' + data + '> ')
+          if (data.indexOf(' ') > 25) {
+            // Big number signifies the docker id
+            self.validateEvol()
+          }
         })
 
         ls.stderr.on('data', function (data) {
@@ -81,6 +85,7 @@ export default {
         var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'evolCheck.sh'), (error, stdout, stderr) => {
           if (error) {
           // throw error
+            console.log(error)
           // do nothing
           }
           if (stdout.includes('good')) {
@@ -119,6 +124,10 @@ export default {
         var self = this
         ls.stdout.on('data', function (data) {
           console.log('stdout: <' + data + '> ')
+          if (data.indexOf(' ') > 25) {
+            // Big number signifies the docker id
+            self.validateSim()
+          }
         })
 
         ls.stderr.on('data', function (data) {
