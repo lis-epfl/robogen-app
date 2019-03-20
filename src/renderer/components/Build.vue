@@ -321,7 +321,7 @@ export default {
       )
       var ls = childProcess.execFile(
         path.join(__static, 'scripts', 'sim', 'sim.sh'),
-        [robFile, 'conf.txt']
+        [robFile, 'myConf.txt']
       )
 
       ls.stdout.on('data', function (data) {
