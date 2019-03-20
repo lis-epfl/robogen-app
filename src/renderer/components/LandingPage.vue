@@ -51,7 +51,8 @@ export default {
       robotFiles: [],
       simFiles: [],
       evolFiles: [],
-      resultFolders: []
+      resultFolders: [],
+      ongoingEvolution: false
     }
   },
   name: 'landing-page',

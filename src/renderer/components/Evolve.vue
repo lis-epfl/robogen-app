@@ -247,6 +247,12 @@
 
       <div class="row">
         <div style="width:100%">
+          <p style="color:red;float:right">{{validationError}}</p>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div style="width:100%">
           <input type="button" value="Evolve" :disabled="!isValid" @click="testEvol">
         </div>
       </div>
@@ -306,6 +312,7 @@ export default {
       filepath: '',
       cpuCount: 1,
       referenceRobotFile: '',
+      validationError: '',
       selectedEvolFile: '',
       localProjectFolderPath: this.projectFolderPath,
       localSimFiles: this.simFiles,
@@ -546,7 +553,14 @@ export default {
       return this.content
     },
     isValid: function () {
+      this.validationError = ''
       if (this.evolutionMode === 'brain' && this.robotFile === '') {
+        this.validationError = 'Robot file required for brain evolution.'
+        return false
+      }
+
+      if (this.$parent.ongoingEvolution) {
+        this.validationError = 'Multiple evolution prohibited.'
         return false
       }
       return true

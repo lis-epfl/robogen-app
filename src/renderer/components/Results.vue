@@ -749,6 +749,9 @@ export default {
       this.tabIndex = 0
       this.selectedFolder = this.getLatestEvolFolder()
     },
+    ongoingEvolution () {
+      this.$parent.ongoingEvolution = this.ongoingEvolution
+    },
     selectedFolder () {
       this.loadResults(this.projectFolderPath, this.selectedFolder)
     }
