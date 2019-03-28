@@ -48,7 +48,7 @@
           <div class="row">
             <file-select
               v-model="robotFile"
-              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt','json']}]"
+              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]"
               :defaultPath="projectFolderPath"
               :optional="true"
               ref="robotFile"
@@ -500,7 +500,6 @@ export default {
         ls.stderr.on('data', function (data) {
           console.log('stderr: ' + data)
           Event.$emit('endEvol', -1)
-          alert(data)
         })
 
         ls.on('close', function (code) {
