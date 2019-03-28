@@ -54,10 +54,14 @@ export default {
         var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'start.sh'))
         var self = this
         ls.stdout.on('data', function (data) {
-          console.log('stdout: <' + data + '> ')
-          if (data.indexOf(' ') > 25) {
-            // Big number signifies the docker id
+          if(data === undefined){
             self.validateEvol()
+          } else {
+            console.log('stdout: <' + data + '> ')
+            if (data.indexOf(' ') > 25) {
+              // Big number signifies the docker id
+              self.validateEvol()
+            }
           }
         })
 
