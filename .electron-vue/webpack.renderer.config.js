@@ -194,6 +194,10 @@ if (process.env.NODE_ENV === 'production') {
       {
         path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'evol', 'evol.sh'),
         fileMode: '555' 
+      },
+      {
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'evol', 'kill.sh'),
+        fileMode: '555' 
       }
     ]}),
     new webpack.DefinePlugin({

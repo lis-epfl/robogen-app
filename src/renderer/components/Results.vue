@@ -82,14 +82,17 @@
 
               <template slot="best" scope="data">
                 <span v-if="data.item.best == -1000000"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-if="data.item.best == -1111111" style="color:red"><font-awesome-icon icon="window-close"/> &nbsp;Terminated </span>
                 <span v-else>{{data.item.best}}</span>
               </template>
               <template slot="avg" scope="data">
                 <span v-if="data.item.avg == -1000000"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-if="data.item.avg == -1111111" style="color:red"><font-awesome-icon icon="window-close"/> &nbsp;Terminated </span>
                 <span v-else>{{data.item.avg}}</span>
               </template>
               <template slot="std" scope="data">
                 <span v-if="data.item.std == -1000000"><font-awesome-icon icon="spinner" spin/></span>
+                <span v-if="data.item.std == -1111111" style="color:red"><font-awesome-icon icon="window-close"/> &nbsp;Terminated </span>
                 <span v-else>{{data.item.std}}</span>
               </template>
             </b-table>
@@ -106,11 +109,24 @@
               <p> No ongoing evolution</p>
             </div>
             <div v-else>
-            <div style="width:100%">
+              <b-button v-b-modal.terminateConfirm variant="danger" style="float:right">Terminate Evolution</b-button>
+
+              <b-modal id="terminateConfirm" hide-footer centered title="Terminate Evolution">
+                <div class="d-block text-center">
+                  <p>Are you sure to terminate the ongoing evolution?</p>
+                </div>
+                <div style="text-align: center;">
+                <b-button class="mt-3 mb-4" variant="danger" @click="terminateEvolution()">Yes, Terminate the evolution</b-button>
+                <b-button class="mt-3 mb-4" variant="info" @click="hideTerminationModel()">No, Continue evolution</b-button>
+                </div>
+              </b-modal>
+
+            <div style="width:100%;padding-top:55px">
             <v-chart :options="options" :autoResize="true"/>
             </div>
             <hr style="margin:0">
-            <span class="text-center">Performance scale</span>
+            <span class="text-center" 
+            >Performance scale</span>
               <b-progress :max="100">
                 <b-progress-bar v-for="n in 100" :key="n" :value="1" v-b-tooltip.hover :title="n" :style="{ backgroundColor: getColour(n,1,100,[],false)}" style="cursor: pointer;"><span style="width:100%;height:100%"></span></b-progress-bar>
               </b-progress>
@@ -185,9 +201,11 @@
 
 <script>
 import 'echarts/lib/component/axis'
-import 'echarts/lib/echarts'
+import 'echarts/lib/echarts' // The power of Node.JS
+import path from 'path'
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
 // var os = require('os')
+const childProcess = require('child_process')
 var cmap = require('colormap')
 export default {
   props: {
@@ -442,11 +460,8 @@ export default {
     },
     getLatestEvolFolder () {
       var files = fs.readdirSync(this.projectFolderPath)
-      var latest = -1
+      var latest = 0
       for (var i = 0; i < files.length; i++) {
-        if (files[i].includes('evol_results')) {
-          latest = 0
-        }
         if (files[i].includes('evol_results_')) {
           if (parseInt(files[i].substring('evol_results_'.length)) > latest) {
             latest = parseInt(files[i].substring('evol_results_'.length))
@@ -671,14 +686,17 @@ export default {
           generation['std'] = parseFloat(stdev)
           generation['fitness'] = []
           if (!(isNaN(generationCount) || isNaN(best) || isNaN(average) || isNaN(stdev))) {
-            this.pastEvolution.push(generation)
-            // Populate data
-            this.pastGraphOptions.xAxis.data.push(generationCount)
-            this.pastGraphOptions.series[0].data.push(parseFloat(best))
-            this.pastGraphOptions.series[1].data.push(parseFloat(average))
-            var low = parseFloat(average) - parseFloat(stdev) / 2
-            this.pastGraphOptions.series[2].data.push(low)
-            this.pastGraphOptions.series[3].data.push(parseFloat(stdev))
+            if (!(best === -1111111)) {
+              // No not push terminated generation
+              this.pastEvolution.push(generation)
+              // Populate data
+              this.pastGraphOptions.xAxis.data.push(generationCount)
+              this.pastGraphOptions.series[0].data.push(parseFloat(best))
+              this.pastGraphOptions.series[1].data.push(parseFloat(average))
+              var low = parseFloat(average) - parseFloat(stdev) / 2
+              this.pastGraphOptions.series[2].data.push(low)
+              this.pastGraphOptions.series[3].data.push(parseFloat(stdev))
+            }
           }
         }
       })
@@ -697,7 +715,7 @@ export default {
           alert('An error ocurred reading the load result file :' + err.message)
           this.loadResultsTreditionally(projectFolderPath, resultFolder)
         }
-
+        console.log(data)
         this.pastEvolution = JSON.parse(data)
         this.pastPopulation = 0
         // Update graph
@@ -714,21 +732,53 @@ export default {
 
         // Loop and populate
         for (var i = 0; i < this.pastEvolution.length; i++) {
-          // Populate data
-          this.pastGraphOptions.xAxis.data.push(this.pastEvolution[i].generation)
-          this.pastGraphOptions.series[0].data.push(this.pastEvolution[i].best)
-          this.pastGraphOptions.series[1].data.push(this.pastEvolution[i].avg)
-          var low = this.pastEvolution[i].avg - this.pastEvolution[i].std / 2
-          this.pastGraphOptions.series[2].data.push(low)
-          this.pastGraphOptions.series[3].data.push(parseFloat(this.pastEvolution[i].std))
-          if (this.pastPopulation < this.pastEvolution[i].fitness.length) {
-            this.pastPopulation = this.pastEvolution[i].fitness.length
+          if (!(this.pastEvolution[i].best === -1111111)) { // donot populate terminated data
+            // Populate data
+            this.pastGraphOptions.xAxis.data.push(this.pastEvolution[i].generation)
+            this.pastGraphOptions.series[0].data.push(this.pastEvolution[i].best)
+            this.pastGraphOptions.series[1].data.push(this.pastEvolution[i].avg)
+            var low = this.pastEvolution[i].avg - this.pastEvolution[i].std / 2
+            this.pastGraphOptions.series[2].data.push(low)
+            this.pastGraphOptions.series[3].data.push(parseFloat(this.pastEvolution[i].std))
+            if (this.pastPopulation < this.pastEvolution[i].fitness.length) {
+              this.pastPopulation = this.pastEvolution[i].fitness.length
+            }
           }
         }
       })
     },
     loadVis (generation, individual) {
       console.log('loading g' + generation + 'individual ' + individual)
+    },
+    hideTerminationModel () {
+      this.$root.$emit('bv::hide::modal', 'terminateConfirm')
+    },
+    terminateEvolution () {
+      this.killEvol()
+      Event.$emit('endEvol', 99999)// Terminated evolution
+      console.log('Terminating evolution')
+    },
+    killEvol () {
+      var self = this
+      var ls = childProcess.execFile(
+        path.join(__static, 'scripts', 'evol', 'kill.sh')
+      )
+
+      ls.stdout.on('data', function (data) {
+        if (data.includes('evol')) {
+          self.$root.$emit('bv::hide::modal', 'terminateConfirm')
+        }
+        console.log('stdout: <' + typeof data + '> ')
+      })
+
+      ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data)
+        alert(data)
+      })
+
+      ls.on('close', function (code) {
+        console.log('child process exited with code ' + code)
+      })
     }
 
   },
@@ -748,6 +798,7 @@ export default {
       this.ongoingEvolution = false
       this.tabIndex = 0
       this.selectedFolder = this.getLatestEvolFolder()
+      this.loadResults(this.projectFolderPath, this.selectedFolder)
     },
     ongoingEvolution () {
       this.$parent.ongoingEvolution = this.ongoingEvolution
@@ -766,11 +817,17 @@ export default {
     })
 
     Event.$on('endEvol', function (code) {
-      if (!(code === 0 || code === 137)) {
+      if (!(code === 0 || code === 137 || code === 99999 || code === -1)) {
         alert('Evolution ended with code ' + code)
       }
+      var evolutionData = self.evolution
+      if (code === 99999) {
+        evolutionData[evolutionData.length - 1].best = -1111111
+        evolutionData[evolutionData.length - 1].avg = -1111111
+        evolutionData[evolutionData.length - 1].std = -1111111
+      }
       var filename = self.projectFolderPath + '/' + self.getLatestEvolFolder() + '/evolution.json'
-      fs.writeFile(filename, JSON.stringify(self.evolution), function (err) {
+      fs.writeFile(filename, JSON.stringify(evolutionData), function (err) {
         if (err) {
           return console.log(err)
         }
@@ -815,5 +872,9 @@ export default {
 }
 td[colspan="5"] {
   padding:0 !important;
+}
+
+header{
+  height: 63px !important;
 }
 </style>
