@@ -54,7 +54,7 @@ export default {
         var ls = childProcess.execFile(path.join(__static, 'scripts', 'evol', 'start.sh'))
         var self = this
         ls.stdout.on('data', function (data) {
-          if(data === undefined){
+          if (data === undefined) {
             self.validateEvol()
           } else {
             console.log('stdout: <' + data + '> ')

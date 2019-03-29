@@ -3,7 +3,7 @@
     <fieldset>
       <div class="row">
         <div class="col-sm-8" style="padding:0">
-          <legend style="border:0;margin:0">Simulation Configuration
+          <legend style="border:0;margin:0">Simulation Settings
             <legend style="font-size:16px">
               {{name}}.sim.txt
               <span
@@ -377,7 +377,7 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        if (!data.includes('body parts') && !data.includes('driver')) {
+        if (!data.includes('body parts') && !data.includes('driver') && !data.includes('libGL')) {
           alert('stderr: ' + data)
         }
       })

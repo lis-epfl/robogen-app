@@ -3,7 +3,7 @@
     <fieldset>
       <div class="row">
         <div class="col-sm-8" style="padding:0">
-          <legend>Evolver Configuration
+          <legend>Evolution Settings
             <legend style="font-size:16px">
               {{name}}.evol.txt
               <span
