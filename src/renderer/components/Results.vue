@@ -460,11 +460,15 @@ export default {
     },
     getLatestEvolFolder () {
       var files = fs.readdirSync(this.projectFolderPath)
-      var latest = 0
+      var latest = -1
       for (var i = 0; i < files.length; i++) {
         if (files[i].includes('evol_results_')) {
           if (parseInt(files[i].substring('evol_results_'.length)) > latest) {
             latest = parseInt(files[i].substring('evol_results_'.length))
+          }
+        } else if (files[i].includes('evol_results')) {
+          if (latest < 0) {
+            latest = 0
           }
         }
       }
@@ -508,7 +512,6 @@ export default {
         var neuralNetwork = JSON.parse(data)
         var tempFields = {}
         var connection = {}
-        console.log(connection)
         var allLabel = {} // Contains column id {'neuron id': temprory id}
         var zeroArray = []
         tempFields['x'] = {}
