@@ -317,12 +317,12 @@ export default {
     },
     runTest: function () {
       var robFile = this.filepath.substring(
-        this.filepath.indexOf('examples') + 9,
+        this.filepath.indexOf(this.mainFolderPath) + this.mainFolderPath.length + 1,
         this.filepath.length
       )
       var ls = childProcess.execFile(
         path.join(__static, 'scripts', 'sim', 'sim.sh'),
-        [robFile, 'myConf.txt', this.seed]
+        [robFile, path.join('..', 'examples', 'myConf.txt'), this.seed]
       )
 
       ls.stdout.on('data', function (data) {

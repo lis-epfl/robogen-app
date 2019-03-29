@@ -139,6 +139,8 @@ export default {
             self.validateSim()
           } else if (data.includes('Bad substitution')) {
             self.validateSim()
+          } else if (data.includes('chromium')) {
+            self.validateSim()
           } else if (!self.checkDownload(data)) {
             alert('stderr activateSim: ' + data)
           }

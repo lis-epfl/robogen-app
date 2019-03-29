@@ -334,32 +334,31 @@ export default {
     },
     simulate (mainFolderPath, simFilePath, robotFile) {
       if (
-        !simFilePath.includes('examples') ||
-        !robotFile.includes('examples')
+        !simFilePath.includes(mainFolderPath) ||
+        !robotFile.includes(mainFolderPath)
       ) {
         if (this.generateHardwareFiles) {
           alert('Simulate your robot before generating output')
         } else {
           alert(
-            'Only the files in the example folder can used. Current filepath = ' +
+            'Only the files in the path' + mainFolderPath + 'folder can used. Current filepath = ' +
               mainFolderPath + ' , ' + simFilePath + ' , ' + robotFile
           )
         }
         return
       }
-
       var file = simFilePath.substring(
-        simFilePath.indexOf('examples') + 9,
+        simFilePath.indexOf(mainFolderPath) + mainFolderPath.length + 1,
         simFilePath.length
       )
 
       var robFile = robotFile.substring(
-        robotFile.indexOf('examples') + 9,
+        robotFile.indexOf(mainFolderPath) + mainFolderPath.length + 1,
         robotFile.length
       )
 
       var relativeProjectFolder = this.projectFolderPath.substring(
-        robotFile.indexOf('examples') + 9,
+        robotFile.indexOf(mainFolderPath) + mainFolderPath.length + 1,
         robotFile.length
       )
 

@@ -475,15 +475,15 @@ export default {
         this.save_evol_file(true)
       }
       if (this.saved) {
-        if (!self.filepath.includes('examples')) {
+        if (!self.filepath.includes(self.mainFolderPath)) {
           alert(
-            'Only the files in the example folder can used. Current filepath = ' +
+            'Only the files in the ' + self.mainFolderPath + 'folder can used. Current filepath = ' +
               self.filepath
           )
           return
         }
         var file = self.filepath.substring(
-          self.filepath.indexOf('examples') + 9,
+          self.filepath.indexOf(self.mainFolderPath) + self.mainFolderPath.length + 1,
           self.filepath.length
         )
         console.log(file)

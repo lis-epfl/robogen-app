@@ -58,6 +58,7 @@
     </div>
 </template>
 <script>
+import path from 'path'
 import FolderSelect from './Helper/FolderSelect.vue'
 const os = require('os')
 var fs = require('fs') // Load the File System to execute our common tasks (CRUD)
@@ -68,7 +69,7 @@ export default {
   },
   data () {
     return {
-      mainFolderPath: '/home/' + os.userInfo().username + '/Robogen/examples',
+      mainFolderPath: path.join('/home', os.userInfo().username, 'Robogen', 'Exercises'),
       projectFolderPath: '',
       errorProjectFolderPath: '',
       robotFiles: '',
