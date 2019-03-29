@@ -718,7 +718,6 @@ export default {
           alert('An error ocurred reading the load result file :' + err.message)
           this.loadResultsTreditionally(projectFolderPath, resultFolder)
         }
-        console.log(data)
         this.pastEvolution = JSON.parse(data)
         this.pastPopulation = 0
         // Update graph
@@ -808,6 +807,8 @@ export default {
     },
     selectedFolder () {
       this.loadResults(this.projectFolderPath, this.selectedFolder)
+      this.pastNnVis['generation'] = -1
+      this.pastNnVis['individual'] = -1
     }
   },
   // mounted () {
@@ -878,6 +879,6 @@ td[colspan="5"] {
 }
 
 header{
-  height: 63px !important;
+  height: 63px;
 }
 </style>

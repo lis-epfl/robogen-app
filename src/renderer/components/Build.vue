@@ -152,6 +152,7 @@ export default {
       connections: '',
       bias: '',
       robotFile: '',
+      seed: Math.floor(Math.random() * (100 - 0)) + 0,
       localProjectFolderPath: this.projectFolderPath,
       localRobotFiles: this.robotFiles,
       localMainFolderPath: this.mainFolderPath
@@ -321,7 +322,7 @@ export default {
       )
       var ls = childProcess.execFile(
         path.join(__static, 'scripts', 'sim', 'sim.sh'),
-        [robFile, 'myConf.txt']
+        [robFile, 'myConf.txt', this.seed]
       )
 
       ls.stdout.on('data', function (data) {

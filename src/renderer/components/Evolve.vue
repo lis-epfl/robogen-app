@@ -28,7 +28,22 @@
       </div>
 
       <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
+          <div class="row">
+            <label class="label" for="robot">Robot File (<span v-if="evolutionMode == 'brain'"> Required </span><span v-else> Optional </span>)</label>
+          </div>
+          <div class="row">
+            <file-select
+              v-model="robotFile"
+              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]"
+              :defaultPath="projectFolderPath"
+              :optional=true
+              ref="robotFile"
+            ></file-select>
+          </div>
+          <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
+        </div>
+        <div class="col-sm-4">
           <div class="row">
             <label class="label" for="ff">Simulation File (Required)</label>
           </div>
@@ -41,20 +56,9 @@
             ></file-select>
           </div>
         </div>
-        <div class="col-sm-6">
-          <div class="row">
-            <label class="label" for="robot">Robot File (Optional for full evolution)</label>
-          </div>
-          <div class="row">
-            <file-select
-              v-model="robotFile"
-              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]"
-              :defaultPath="projectFolderPath"
-              :optional="true"
-              ref="robotFile"
-            ></file-select>
-          </div>
-          <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
+        <div class="col-sm-4">
+          <label class="label" for="seed">Seed (Required)</label>
+          <input type="number" name="seed" id="seed" required v-model="seed">
         </div>
       </div>
       <div class="row">
@@ -187,11 +191,11 @@
           </b-card>
           <b-card no-body class="mb-1">
             <b-card-header header-tag="header" class="p-1" role="tab" style="height:inherit">
-              <b-btn block href="#" v-b-toggle.accordion2 variant="light" style="text-align:left">
+              <b-btn block href="#" v-b-toggle.accordion2 variant="light" style="text-align:left" :aria-expanded="true">
                 <font-awesome-icon icon="chevron-down"/>&nbsp; Body Variation Parameters
               </b-btn>
             </b-card-header>
-            <b-collapse id="accordion2" accordion="my-accordion" role="tabpanel">
+            <b-collapse id="accordion2" accordion="my-accordion" role="tabpanel" v-if="evolutionMode =='full'" >
               <b-card-body>
                 <div class="row">
                   <div class="col-sm-3">
@@ -253,7 +257,7 @@
       
       <div class="row">
         <div style="width:100%">
-          <input type="button" value="Evolve" :disabled="!isValid" @click="testEvol">
+          <input type="button" value="Evolve Robot" :disabled="!isValid" @click="testEvol">
         </div>
       </div>
     </fieldset>
@@ -304,6 +308,7 @@ export default {
       numInitialParts: '2:10',
       addBodyPart: 'All',
       maxBodyParts: '20',
+      seed: Math.floor(Math.random() * (100 - 0)) + 0,
       other: '',
       simFile: '',
       robotFile: '',
@@ -489,7 +494,7 @@ export default {
         Event.$emit('newEvol', this.numGenerations)
         var ls = childProcess.execFile(
           path.join(__static, 'scripts', 'evol', 'evol.sh'),
-          [file, folder]
+          [file, folder, this.seed]
         )
 
         ls.stdout.on('data', function (data) {
@@ -554,12 +559,17 @@ export default {
     isValid: function () {
       this.validationError = ''
       if (this.evolutionMode === 'brain' && this.robotFile === '') {
-        this.validationError = 'Robot file required for brain evolution.'
+        this.validationError += 'Robot file required for brain evolution.'
+        return false
+      }
+
+      if (this.pBrainCrossover > 0 && this.pAddHiddenNeuron > 0) {
+        this.validationError += 'Currently both Brain Crossover Probability and Add Hidden Neuron Probability can be grater than zero.'
         return false
       }
 
       if (this.$parent.ongoingEvolution) {
-        this.validationError = 'Multiple evolution prohibited.'
+        this.validationError += 'Multiple evolution prohibited.'
         return false
       }
       return true
@@ -650,5 +660,9 @@ export default {
 
 .tablist {
   width: 100%;
+}
+
+.header {
+  height: auto;
 }
 </style>

@@ -27,7 +27,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="row">
             <label class="label" for="robot">Robot File (Required)</label>
           </div>
@@ -41,7 +41,7 @@
           </div>
           <!-- <input type="file" name="robot" id="robot" required="" accept=".robot.text"> -->
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="row">
             <label class="label" for="ff">Fitness Function (Required)</label>
           </div>
@@ -53,6 +53,14 @@
               ref="scenarioFile"
             ></file-select>
           </div>
+        </div>
+        <div class="col-sm-4">
+          <label class="label" for="seed" id="seed">Seed (Required)</label>
+          <b-tooltip
+            target="seed"
+            placement="seed"
+          >A random seed is a number used to initialize a pseudorandom number generator. </b-tooltip>
+          <input type="number" name="seed" required v-model="seed">
         </div>
       </div>
       <div class="row">
@@ -185,6 +193,7 @@ export default {
       saved: false,
       name: '',
       selectedSimFile: '',
+      seed: Math.floor(Math.random() * (100 - 0)) + 0,
       generateHardwareFiles: false,
       localProjectFolderPath: this.projectFolderPath,
       localSimFiles: this.simFiles,
@@ -367,7 +376,7 @@ export default {
         console.log('Generate hardware')
         ls = childProcess.execFile(
           path.join(__static, 'scripts', 'sim', 'sim.sh'),
-          [robFile, file]
+          [robFile, file, this.seed]
         )
       }
 
