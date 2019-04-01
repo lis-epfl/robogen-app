@@ -285,7 +285,7 @@ export default {
       // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
         dialog.showSaveDialog(
           {
-            defaultPath: this.projectFolderPath + '/' + this.name + '.sim.txt',
+            defaultPath: self.projectFolderPath + '/' + self.name + '.sim.txt',
             filters: [{ name: 'Robogen Sim File', extensions: ['sim.txt'] }]
           },
           fileName => {
@@ -299,24 +299,26 @@ export default {
               if (err) {
                 alert('An error ocurred creating the file ' + err.message)
               }
-              this.simFilePath = fileName
-              this.saved = true
+              self.simFilePath = fileName
+              self.saved = true
               if (simulate === true) {
-                self.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
+                console.log('Asking to simulate')
+                self.simulate(self.mainFolderPath, self.simFilePath, self.robotFile)
               }
             })
           }
         )
       } else {
-        var fileName = this.projectFolderPath + '/' + this.name + '.sim.txt'
+        var fileName = self.projectFolderPath + '/' + self.name + '.sim.txt'
         fs.writeFile(fileName, self.content, err => {
           if (err) {
             alert('An error ocurred creating the file ' + err.message)
           }
-          this.simFilePath = fileName
-          this.saved = true
+          self.simFilePath = fileName
+          self.saved = true
           if (simulate === true) {
-            self.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
+            console.log('Asking to simulate 2' + self.mainFolderPath + self.simFilePath + self.robotFile)
+            self.simulate(self.mainFolderPath, self.simFilePath, self.robotFile)
           }
         })
       }
@@ -325,12 +327,14 @@ export default {
       if (!this.saved) {
         this.save_sim_file(true)
       } else {
-        this.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
+        console.log('Asking to simulate 3' + self.mainFolderPath + self.simFilePath + self.robotFile)
+        this.simulate(this.mainFolderPath, this.simFilePath, this.robotFile)
       }
     },
     outSim: function () {
       this.generateHardwareFiles = true
-      this.simulate(this.localMainFolerPath, this.simFilePath, this.robotFile)
+      console.log('Asking to simulate 4')
+      this.simulate(this.mainFolderPath, this.simFilePath, this.robotFile)
     },
     simulate (mainFolderPath, simFilePath, robotFile) {
       if (
@@ -347,6 +351,7 @@ export default {
         }
         return
       }
+      
       var file = simFilePath.substring(
         simFilePath.indexOf(mainFolderPath) + mainFolderPath.length + 1,
         simFilePath.length
