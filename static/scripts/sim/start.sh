@@ -6,6 +6,6 @@ docker run -it -d --user $(id -u):$(id -g) --rm \
 	--name robogen_sim \
 	--env="DISPLAY" \
 	--expose=49152 \
-	--mount type=bind,source="${SRC_DIR}",target=/robogen/Exercises,bind-propagation=rshared \
+	-v ${SRC_DIR}:/robogen/Exercises:rw \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 	robogen/robogen_app:1.2 /bin/bash
