@@ -179,7 +179,7 @@ export default {
 
         ls.stderr.on('data', function (data) {
           self.simStatus = false
-          if (data.includes('No such container: robogen')) {
+          if (data.includes('No such container: robogen') || data.includes('is not running') ) {
           // alert('Restart sim container')
             self.activateSim()
           } else if (!self.checkDownload(data)) {
