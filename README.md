@@ -2,6 +2,15 @@
 
 > An frontend app for robogen
 
+## Install this app on your own computer
+sudo apt-get update
+sudo apt-get install git docker.io
+sudo groupadd docker
+sudo usermod -a -G docker $USER
+sudo service docker restart
+sudo chmod 666 /var/run/docker.sock
+
+
 ## Working
 
 This 
