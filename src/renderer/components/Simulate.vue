@@ -351,7 +351,7 @@ export default {
         }
         return
       }
-      
+
       var file = simFilePath.substring(
         simFilePath.indexOf(mainFolderPath) + mainFolderPath.length + 1,
         simFilePath.length
