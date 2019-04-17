@@ -358,7 +358,7 @@ export default {
         )
         var params = data.split('\n')
         this.other = ''
-
+        this.addBodyPart = ''
         for (var i = 0; i < params.length; i++) {
           var param = params[i]
           if (param.indexOf('#') > -1) {
@@ -410,7 +410,11 @@ export default {
       } else if (param.includes('numInitialParts=')) {
         this.numInitialParts = param.substring('numInitialParts='.length)
       } else if (param.includes('addBodyPart=')) {
-        this.addBodyPart = param.substring('addBodyPart='.length)
+        if (this.addBodyPart !== '') {
+          this.addBodyPart += ',' + param.substring('addBodyPart='.length)
+        } else {
+          this.addBodyPart = param.substring('addBodyPart='.length)
+        }
       } else if (param.includes('maxBodyParts=')) {
         this.maxBodyParts = param.substring('maxBodyParts='.length)
       } else if (param.includes('referenceRobotFile=')) {
@@ -545,7 +549,10 @@ export default {
       this.content += 'pOscillatorNeuron = ' + this.pOscillatorNeuron + '\n'
       this.content += '\n#Commonly used body variation parameters\n'
       this.content += 'numInitialParts = ' + this.numInitialParts + '\n'
-      this.content += 'addBodyPart = ' + this.addBodyPart + '\n'
+      var bodyPartArray = this.addBodyPart.split(',')
+      for (var i = 0; i < bodyPartArray.length; i++) {
+        this.content += 'addBodyPart = ' + bodyPartArray[i] + '\n'
+      }
       this.content += 'maxBodyParts = ' + this.maxBodyParts + '\n'
       this.content +=
         'socket=127.0.0.1:49152\nbrainBounds=-3:3\nbrainSigma=.7\n'
