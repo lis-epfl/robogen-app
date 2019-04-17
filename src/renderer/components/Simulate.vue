@@ -390,8 +390,8 @@ export default {
       })
 
       ls.stderr.on('data', function (data) {
-        if (!data.includes('body parts') && !data.includes('driver') && !data.includes('libGL')) {
-          alert('stderr: ' + data)
+        if (!data.includes('driver') && !data.includes('libGL')) {
+          alert(data, 'Robogen Logger')
         }
       })
 
