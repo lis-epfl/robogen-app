@@ -29,7 +29,7 @@
             </div>
             <div>
               <p style="color: rgba(128, 128, 128, 0.66);font-weight: bold;">
-              Build number: <i> 2.2.0-beta </i>
+              Build number: <i> 2.3.0-beta </i>
               </p>
             </div>
             

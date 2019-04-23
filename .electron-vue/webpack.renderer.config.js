@@ -182,6 +182,10 @@ if (process.env.NODE_ENV === 'production') {
         path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'sim', 'out.sh'),
         fileMode: '555' 
       },
+      {
+        path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'sim', 'robotConvert.sh'),
+        fileMode: '555' 
+      },
       //Evol
       {
         path: path.resolve(__dirname, '..', 'dist', 'electron', 'static', 'scripts', 'evol', 'evolCheck.sh'),
