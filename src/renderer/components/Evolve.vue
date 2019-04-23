@@ -35,9 +35,10 @@
           <div class="row">
             <file-select
               v-model="robotFile"
-              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]"
+              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt', 'json']}]"
               :defaultPath="projectFolderPath"
               :optional=true
+              :mainFolderPath="mainFolderPath"
               ref="robotFile"
             ></file-select>
           </div>

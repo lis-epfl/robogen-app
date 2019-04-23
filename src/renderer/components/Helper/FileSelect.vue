@@ -4,14 +4,16 @@
         <span v-if="filePath">Selected File</span>
         <span v-else>Select File <br> <span class="select-extention">{{accept[0].ext}}</span></span>
     </div>
-      <span style="display:inline-block">{{getFileName()}}</span>
+      <span style="display:inline-block">{{filePath.substring(filePath.lastIndexOf('/') + 1)}}</span>
       <input type="button" @click="get_file"/>
       <span v-if="optional&&filePath" @click.prevent="removeFile">&nbsp;<font-awesome-icon icon="trash-alt" class="text-danger"/></span>
   </label>
 </template>
 
 <script>
+import path from 'path'
 const {dialog} = require('electron').remote
+const childProcess = require('child_process') // The power of Node.JS
 export default {
   props: {
     value: {
@@ -21,6 +23,9 @@ export default {
       type: Array
     },
     defaultPath: {
+      type: String
+    },
+    mainFolderPath: {
       type: String
     },
     optional: {
@@ -47,20 +52,37 @@ export default {
           console.log('Error no file selected')
           console.log(this.defaultPath)
         } else {
-          this.filePath = fileName[0]
+          var file = fileName[0].substring(
+            fileName[0].indexOf(this.mainFolderPath) + this.mainFolderPath.length + 1,
+            fileName[0].length
+          )
+          if (fileName[0].includes('.json')) {
+            this.filePath = fileName[0].substring(0, fileName[0].length - '.json'.length) + '.robot.txt'
+            console.log(this.filePath)
+            console.log('Do convertion. ' + file, ' ', file.substring(0, file.length - '.json'.length) + '.robot.txt')
+            childProcess.execFile(
+              path.join(__static, 'scripts', 'sim', 'robotConvert.sh'),
+              [file, file.substring(0, file.length - '.json'.length) + '.robot.txt']
+            )
+          } else {
+            this.filePath = fileName[0]
+          }
           this.$emit('input', this.filePath)
         }
       })
     },
-    getFileName: function () {
-      return this.filePath.substring(this.filePath.lastIndexOf('/') + 1)
-    },
     updateFilePath: function (filePath) {
+      console.log('Updating file path: ' + filePath)
       this.filePath = filePath
     },
     removeFile: function () {
       this.filePath = ''
       this.$emit('input', this.filePath)
+    }
+  },
+  computed: {
+    getFileName: function () {
+      return this.filePath.substring(this.filePath.lastIndexOf('/') + 1)
     }
   }
 }

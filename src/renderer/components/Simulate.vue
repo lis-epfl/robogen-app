@@ -34,8 +34,8 @@
           <div class="row">
             <file-select
               v-model="robotFile"
-              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt']}]"
-              :defaultPath="projectFolderPath"
+              :accept="[{'name': 'Robogen Robot File', 'ext' :['robot.txt', 'json']}]"
+              :defaultPath="projectFolderPath" :mainFolderPath="mainFolderPath"
               ref="robotFile"
             ></file-select>
           </div>
@@ -49,7 +49,7 @@
             <file-select
               v-model="scenarioFile"
               :accept="[{'name': 'Robogen Scenario File', 'ext' :['js']}]"
-              :defaultPath="projectFolderPath"
+              :defaultPath="projectFolderPath" 
               ref="scenarioFile"
             ></file-select>
           </div>
@@ -249,10 +249,10 @@ export default {
         }
       })
       this.saved = true
-      if (this.robotFiles.length === 1) {
-        this.robotFile = this.projectFolderPath + '/' + this.robotFiles[0]
-        this.$refs.robotFile.updateFilePath(this.robotFile)
-      }
+      // if (this.robotFiles.length === 1) {
+      //   this.robotFile = this.projectFolderPath + '/' + this.robotFiles[0]
+      //   this.$refs.robotFile.updateFilePath(this.robotFile)
+      // }
     },
     updateData: function (param) {
       if (param.includes('simulationTime=')) {
