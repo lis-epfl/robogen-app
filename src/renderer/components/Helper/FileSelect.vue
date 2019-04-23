@@ -60,10 +60,23 @@ export default {
             this.filePath = fileName[0].substring(0, fileName[0].length - '.json'.length) + '.robot.txt'
             console.log(this.filePath)
             console.log('Do convertion. ' + file, ' ', file.substring(0, file.length - '.json'.length) + '.robot.txt')
-            childProcess.execFile(
+            var ls = childProcess.execFile(
               path.join(__static, 'scripts', 'sim', 'robotConvert.sh'),
               [file, file.substring(0, file.length - '.json'.length) + '.robot.txt']
             )
+            ls.stdout.on('data', function (data) {
+              console.log('stdout: <' + data + '> ')
+              // alert('stdout: <' + data + '> ')
+            })
+
+            ls.stderr.on('data', function (data) {
+              alert(data, 'Robogen Logger')
+              this.filePath = ''
+            })
+
+            ls.on('close', function (code) {
+              console.log('JSONConverter process exited with code ' + code)
+            })
           } else {
             this.filePath = fileName[0]
           }
