@@ -19,7 +19,7 @@
           <label class="label" for="textarea">Robot File</label>
           <b-form-select v-model="selectedRobotFile" class="mb-3">
             <option
-              v-for="robotFile in robotFiles"
+              v-for="robotFile in validRobotFiles"
               :key="robotFile"
               :title="robotFile"
               :value="robotFile"
@@ -392,6 +392,9 @@ export default {
     }
   },
   computed: {
+    validRobotFiles: function () {
+      return this.robotFiles.filter((x) => { return x.includes('.robot.txt') })
+    },
     saveCheck: function () {
       var temp = this.body + this.hiddenNeurons + this.connections + this.bias
       if (temp !== '') {
@@ -402,10 +405,17 @@ export default {
     update: function () {
       if (this.robotFiles.length > 0) {
         if (this.selectedRobotFile === '') {
-          this.selectedRobotFile = this.robotFiles[0]
-          this.load_file(this.projectFolderPath + '/' + this.robotFiles[0])
-          this.saved = true
-        } else if (this.selectedRobotFile !== 'NewRobot') {
+          this.selectedRobotFile = this.robotFiles.find(function (el) {
+            return el.includes('.robot.txt')
+          })
+
+          if (typeof this.selectedRobotFile !== 'undefined') {
+            this.load_file(this.projectFolderPath + '/' + this.selectedRobotFile)
+            this.saved = true
+          } else {
+            this.update()
+          }
+        } else if (this.selectedRobotFile !== 'NewRobot' && typeof this.selectedRobotFile !== 'undefined') {
           this.load_file(this.projectFolderPath + '/' + this.selectedRobotFile)
           this.saved = true
         } else {

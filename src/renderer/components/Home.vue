@@ -142,6 +142,8 @@ export default {
         for (var i = 0; i < files.length; i++) {
           if (files[i].includes('.robot.txt')) {
             this.robotFiles.push(files[i])
+          } else if (files[i].includes('.json')) {
+            this.robotFiles.push(files[i])
           } else if (files[i].includes('.sim.txt')) {
             this.simFiles.push(files[i])
           } else if (files[i].includes('.evol.txt')) {
