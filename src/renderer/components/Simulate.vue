@@ -55,48 +55,61 @@
           </div>
         </div>
         <div class="col-sm-4">
-          <label class="label" for="seed" id="seed">Seed (Required)</label>
+          <label class="label" for="seed" >Seed (Required)</label>
           <b-tooltip
             target="seed"
             placement="seed"
           >A random seed is a number used to initialize a pseudorandom number generator. </b-tooltip>
-          <input type="number" name="seed" required v-model="seed">
+          <input type="number" name="seed" id="seed" required v-model="seed">
         </div>
       </div>
       <div class="row">
         <div class="col-sm-6">
-          <label class="label" for="timeStep" id="timeStep">Time Step (Required)</label>
+          <label class="label" for="timeStep" >Time Step (Required)</label>
           <b-tooltip
             target="timeStep"
             placement="topright"
           >Time step of the simulation in seconds. The smaller it is, the less error prone the simulation, but the longer it takes to simulate the same amount of time.</b-tooltip>
-          <input type="number" name="timeStep" required v-model="timeStep">
+          <input type="number" name="timeStep" id="timeStep" required v-model="timeStep">
         </div>
 
         <div class="col-sm-6">
-          <label class="label" for="st" id="st">Simulation Time (s)</label>
+          <label class="label" for="st">Simulation Time (s)</label>
           <b-tooltip target="st" placement="topright">
             Total length of simulation in seconds. Must be a multiple of timeStep.
             <strong>One of nTimeSteps or simulationTime must be specified.</strong>
           </b-tooltip>
-          <input type="number" name="st" required v-model="simulationTime">
+          <input type="number" name="st" id="st" required v-model="simulationTime">
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-6">
           <label class="label" for="tf">Terrain Friction</label>
+          <b-tooltip
+            target="tf"
+            placement="topright"
+          >Friction coeffecient between the ground/obstacles and the robot. </b-tooltip>
           <input type="number" name="tf" id="tf" required v-model="terrainFriction">
         </div>
         <div class="col-sm-6">
           <label class="label" for="gra">Gravity (m/s^2)</label>
+          <b-tooltip
+            target="gra"
+            placement="topright"
+          >Gravity: either a single z-value for g=(0,0,z) or x,y,z (comma separated) for full g vector. Specified in m/(s^2).  Defaults to (0,0,-9.81). </b-tooltip>
           <input type="text" name="gra" id="gra" required v-model="gravity">
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-12">
-          <label class="label" for="textarea">Other Parameters</label>
+          <label class="label" for="textarea">Other Parameters (<span @click="open('http://robogen.org/docs/evolution-configuration/#Simulator_settings')" style="cursor: pointer; text-decoration: underline; color: #2ea169;" >Simulation Settings Documentation</span>) </label>
+          <b-tooltip
+            target="textarea"
+            placement="topright"
+          >Other optional parameters from Robogen Documentation. </b-tooltip>
+          
           <textarea name="textarea" id="textarea" v-model="other"></textarea>
         </div>
       </div>
@@ -202,6 +215,10 @@ export default {
     }
   },
   methods: {
+    // Open external link
+    open (link) {
+      this.$electron.shell.openExternal(link)
+    },
     // Load file
     open_file: function () {
       dialog.showOpenDialog(

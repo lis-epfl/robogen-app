@@ -58,14 +58,20 @@
           </div>
         </div>
         <div class="col-sm-4">
-          <label class="label" for="seed">Seed (Required)</label>
-          <input type="number" name="seed" id="seed" required v-model="seed">
+          <label class="label" for="seed2">Seed (Required)</label>
+          <b-tooltip target="seed2" placement="top">
+            A random seed is a number used to initialize a pseudorandom number generator.
+          </b-tooltip>
+          <input type="number" name="seed2" id="seed2" required v-model="seed">
         </div>
       </div>
       <div class="row">
         <div class="col-sm-3">
           <div class="row">
-            <label class="label" for="vue-form-list">Evolution Mode</label>
+            <label class="label" for="vue-form-list" id="evolutionMode">Evolution Mode</label>
+            <b-tooltip target="evolutionMode" placement="top">
+              Specify whether you want to do brain/body co-evolution (full) or evolve only the brain. 
+            </b-tooltip>
           </div>
           <ul class="vue-form-list">
             <li>
@@ -80,6 +86,9 @@
         </div>
         <div class="col-sm-3">
           <label class="label" for="numGenerations">Number of generations</label>
+          <b-tooltip target="numGenerations" placement="top">
+              Number of generations to evolve for.
+            </b-tooltip>
           <input
             type="number"
             name="numGenerations"
@@ -90,10 +99,16 @@
         </div>
         <div class="col-sm-3">
           <label class="label" for="mu">Mu (&mu;)</label>
+          <b-tooltip target="mu" placement="top">
+              mu (μ) = number of parents.  [ (μ+/,λ) evolution strategy terminology ]. This is the number of individuals selected at each step of the evolution.
+            </b-tooltip>
           <input type="number" name="mu" id="mu" required v-model="mu">
         </div>
         <div class="col-sm-3">
           <label class="label" for="lambda">Lambda (&lambda;)</label>
+          <b-tooltip target="lambda" placement="top">
+          lambda (λ) = number of offspring.  [ (μ+/,λ) evolution strategy terminology ]. This is the number of new individuals generated from the parents at each step of the evolution. Lambda should be larger than or equal to mu. See ‘replacement’ below.
+          </b-tooltip>
           <input type="number" name="lambda" id="lambda" required v-model="lambda">
         </div>
       </div>
@@ -101,7 +116,10 @@
       <div class="row">
         <div class="col-sm-3">
           <div class="row">
-            <label class="label" for="vue-form-list">Replacement</label>
+            <label class="label" for="vue-form-list" id="replacement">Replacement</label>
+            <b-tooltip target="replacement" placement="top">
+          In the case of “plus” replacement, the mu parents and lambda children are grouped together and ranked according to their measured fitness values, the top mu individuals are copied to the new population (elitism). This allows evolution to make sure that good solutions are not lost because of mutation or crossover. On the other hand, in the case of “comma” replacement, the mu parents are discarded, the lambda children are ranked, and the top mu of these are copied to the new population (lambda>=mu). This replacement strategy favors exploration.
+          </b-tooltip>
           </div>
           <ul class="vue-form-list">
             <li>
@@ -116,6 +134,9 @@
         </div>
         <div class="col-sm-3">
           <label class="label" for="tournamentSize">Tournament Size</label>
+          <b-tooltip target="tournamentSize" placement="top">
+This parameter determines the size of the tournament pools for selection of individuals. See ‘selection’ above. Setting the tournament size equal to lambda (in case of “comma” replacement) or mu+lambda (in case of “plus” replacement) gives a selection equivalent to truncated rank-based selection.
+          </b-tooltip>
           <input
             type="number"
             name="tournamentSize"
@@ -139,6 +160,9 @@
                 <div class="row">
                   <div class="col-sm-3">
                     <label class="label" for="pBrainMutate">Brain Mutation Probability</label>
+                    <b-tooltip target="pBrainMutate" placement="top">
+The mutation probability for each brain parameter. 
+          </b-tooltip>
                     <input
                       type="number"
                       name="pBrainMutate"
@@ -152,6 +176,9 @@
                   </div>
                   <div class="col-sm-3">
                     <label class="label" for="pBrainCrossover">Brain Crossover Probability</label>
+                    <b-tooltip target="pBrainCrossover" placement="top">
+                      Probability of 1-point-crossover.  N.B.  Currently crossover is not supported when either doing full body evolution or when pAddHiddenNeuron > 0
+                    </b-tooltip>
                     <input
                       type="number"
                       name="pBrainCrossover"
@@ -164,6 +191,9 @@
                   </div>
                   <div class="col-sm-3">
                     <label class="label" for="pAddHiddenNeuron">Add Hidden Neuron Probability</label>
+                    <b-tooltip target="pAddHiddenNeuron" placement="top">
+                      Probability of adding a hidden neuron (will be added to the core component).  N.B.  Cannot have pBrainCrossover > 0 and pAddHiddenNeuron > 0
+                    </b-tooltip>
                     <input
                       type="number"
                       name="pAddHiddenNeuron"
@@ -176,6 +206,9 @@
                   </div>
                   <div class="col-sm-3">
                     <label class="label" for="pOscillatorNeuron">Add Oscillator Neuron Probability</label>
+                    <b-tooltip target="pOscillatorNeuron" placement="top">
+                      Probability of new hidden or motor neuron being an oscillator.
+                    </b-tooltip>
                     <input
                       type="number"
                       name="pOscillatorNeuron"
@@ -201,6 +234,9 @@
                 <div class="row">
                   <div class="col-sm-3">
                     <label class="label" for="numInitialParts">Number of inital body parts (min:max)</label>
+                    <b-tooltip target="numInitialParts" placement="top">
+                      Number of initial body parts (not including core component) for full evolution.
+                    </b-tooltip>
                     <input
                       type="text"
                       name="numInitialParts"
@@ -210,10 +246,16 @@
                   </div>
                   <div class="col-sm-3">
                     <label class="label" for="addBodyPart">Body Parts that can be added</label>
+                    <b-tooltip target="addBodyPart" placement="top">
+                      	Add parts to be used in body evolution, can add many parts on separated by `,` or <strong>All</strong> to use all parts. For individual parts you can either use the single-character part codes or the full name in CamelCase (see Guidelines for writing a robot text file).  If doing body evolution it is required to define at least one allowed body part to add.
+                    </b-tooltip>
                     <input type="text" name="addBodyPart" id="addBodyPart" v-model="addBodyPart">
                   </div>
                   <div class="col-sm-3">
                     <label class="label" for="maxBodyParts">Maximum Body Parts</label>
+                    <b-tooltip target="maxBodyParts" placement="top">
+                      	Maximum number of body parts allowed.  Defaults to 100000, an unreasonably large value.
+                    </b-tooltip>
                     <input
                       type="number"
                       name="maxBodyParts"
@@ -236,7 +278,7 @@
 
       <div class="row">
         <div class="col-sm-12">
-          <label class="label" for="textarea">Other Parameters</label>
+          <label class="label" for="textarea">Other Parameters (<span @click="open('http://robogen.org/docs/evolution-configuration/#Evolution_client_settings')" style="cursor: pointer; text-decoration: underline; color: #2ea169;" >Evolution Settings Documentation</span>)</label>
           <textarea name="textarea" id="textarea" v-model="other"></textarea>
         </div>
       </div>
@@ -328,6 +370,10 @@ export default {
     }
   },
   methods: {
+    // Open external link
+    open (link) {
+      this.$electron.shell.openExternal(link)
+    },
     // Load file
     open_file: function () {
       dialog.showOpenDialog(
