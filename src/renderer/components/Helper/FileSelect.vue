@@ -53,11 +53,11 @@ export default {
           console.log('Error no file selected')
           console.log(this.defaultPath)
         } else {
-          var file = fileName[0].substring(
-            fileName[0].indexOf(this.mainFolderPath) + this.mainFolderPath.length + 1,
-            fileName[0].length
-          )
           if (fileName[0].includes('.json')) {
+            var file = fileName[0].substring(
+              fileName[0].indexOf(this.mainFolderPath) + this.mainFolderPath.length + 1,
+              fileName[0].length
+            )
             this.filePath = fileName[0].substring(0, fileName[0].length - '.json'.length) + '.robot.txt'
             console.log(this.filePath)
             console.log('Do convertion. ' + file, ' ', file.substring(0, file.length - '.json'.length) + '.robot.txt')
