@@ -4,7 +4,7 @@
         <span v-if="filePath">Selected File</span>
         <span v-else>Select File <br> <span class="select-extention">{{accept[0].ext}}</span></span>
     </div>
-      <span style="display:inline-block">{{filePath.substring(filePath.lastIndexOf('/') + 1)}}</span>
+      <span style="display:inline-block">{{getFileName}}</span>
       <input type="button" @click="get_file"/>
       <span v-if="optional&&filePath" @click.prevent="removeFile">&nbsp;<font-awesome-icon icon="trash-alt" class="text-danger"/></span>
   </label>
@@ -42,6 +42,7 @@ export default {
   methods: {
     // Load file
     get_file: function () {
+      var saveUpdate = false
       console.log(this.defaultPath)
       dialog.showOpenDialog({
         defaultPath: this.defaultPath,
@@ -68,7 +69,7 @@ export default {
                   alert(err, 'Robogen Logger')
                   this.filePath = ''
                 } else {
-                  Event.$emit('updateFiles')
+                  saveUpdate = true
                 }
                 console.log(stdout)
               }
@@ -77,6 +78,11 @@ export default {
             this.filePath = fileName[0]
           }
           this.$emit('input', this.filePath)
+
+          if (saveUpdate) {
+            this.$parent.save_file()
+            Event.$emit('updateFiles')
+          }
         }
       })
     },
@@ -91,7 +97,10 @@ export default {
   },
   computed: {
     getFileName: function () {
-      return this.filePath.substring(this.filePath.lastIndexOf('/') + 1)
+      return this.filePath.substring(
+        this.filePath.indexOf(this.defaultPath) + this.defaultPath.length + 1,
+        this.filePath.length
+      )
     }
   }
 }

@@ -428,10 +428,8 @@ export default {
     },
     updateData: function (param) {
       if (param.includes('simulatorConfFile=')) {
-        this.simFile = param.substring('simulatorConfFile='.length)
-        this.$refs.simFile.updateFilePath(
-          this.projectFolderPath + '/' + this.simFile
-        )
+        this.simFile = this.projectFolderPath + '/' + param.substring('simulatorConfFile='.length)
+        this.$refs.simFile.updateFilePath(this.simFile)
       } else if (param.includes('evolutionMode=')) {
         this.evolutionMode = param.substring('evolutionMode='.length)
       } else if (param.includes('numGenerations=')) {
@@ -466,8 +464,8 @@ export default {
         this.maxBodyParts = param.substring('maxBodyParts='.length)
       } else if (param.includes('referenceRobotFile=')) {
         this.referenceRobotFile = param.substring('referenceRobotFile='.length)
-        this.$refs.robotFile.updateFilePath(this.referenceRobotFile)
-        this.robotFile = this.referenceRobotFile
+        this.robotFile = this.projectFolderPath + '/' + this.referenceRobotFile
+        this.$refs.robotFile.updateFilePath(this.robotFile)
       } else if (
         param.includes('socket=') ||
         param.includes('brainBounds=') ||
@@ -477,6 +475,11 @@ export default {
       } else {
         this.other += param + '\n'
       }
+    },
+
+    save_file: function () {
+      // this function is called from child component Fileselect
+      this.save_evol_file()
     },
     save_evol_file: function (doEvolve) {
       var self = this
@@ -565,7 +568,11 @@ export default {
       }
     },
     getFileName: function (filePath) {
-      return filePath.substring(filePath.lastIndexOf('/') + 1)
+      var file = filePath.substring(
+        filePath.indexOf(this.projectFolderPath) + this.projectFolderPath.length + 1,
+        filePath.length
+      )
+      return file
     }
   },
   computed: {

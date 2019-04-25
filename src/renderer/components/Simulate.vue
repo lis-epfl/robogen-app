@@ -296,6 +296,10 @@ export default {
         this.other += param + '\n'
       }
     },
+    save_file: function () {
+      // this function is called from child component Fileselect
+      this.save_sim_file()
+    },
     save_sim_file: function (simulate) {
       var self = this
       if (this.selectedSimFile === 'NewSim' || this.selectedSimFile === '') {
