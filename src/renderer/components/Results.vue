@@ -329,6 +329,7 @@ export default {
             name: 'STD',
             type: 'line',
             data: [],
+            color: '#ccc',
             lineStyle: {
               normal: {
                 opacity: 0
