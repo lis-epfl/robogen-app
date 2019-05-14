@@ -557,8 +557,13 @@ export default {
         })
 
         ls.stderr.on('data', function (data) {
-          console.log('stderr: ' + data)
-          Event.$emit('endEvol', -1)
+          
+          if(data.includes('ODE message')){
+            console.log('Not doing anything for ODE messages. Error log: ' + data)
+          }else {
+            console.log('stderr: ' + data)
+            Event.$emit('endEvol', -1)
+          }
         })
 
         ls.on('close', function (code) {
