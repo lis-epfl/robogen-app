@@ -415,7 +415,7 @@ export default {
     validate (gen) {
       var best = gen['best']
       var average = gen['avg']
-      // var std = gen['std']
+      var std = gen['std']
       var fitnesses = gen['fitness']
 
       // Best shoud be one of the individuvial. Sometime console outputs 002525 instead of 0.002525
@@ -424,15 +424,39 @@ export default {
         gen['best'] = Math.max.apply(null, fitnesses) // Reset the best
       }
 
+      // The calculated average and the obtained average should be similar.
       const averageFunc = arr => arr.reduce((p, c) => p + c, 0) / arr.length
       var calculatedMean = averageFunc(fitnesses)
       if (Math.abs(calculatedMean - average) > 0.1) {
-        console.log('Mean reset. Obtained=' + average + ' Actual=' + averageFunc(fitnesses))
-        gen['avg'] = averageFunc(fitnesses) // Reset the best
+        console.log('Mean reset. Obtained=' + average + ' Actual=' + calculatedMean)
+        gen['avg'] = calculatedMean // Reset the avg
       }
 
+      // The calculated std and the obtained std should be similar.
+      var calculatedStd = this.standardDeviation(fitnesses)
+      if (Math.abs(calculatedStd - std) > 0.1) {
+        console.log('Std reset. Obtained=' + gen['std'] + ' Actual=' + calculatedStd)
+
+        gen['std'] = calculatedStd // Reset the std
+      }
       return gen
     },
+    standardDeviation (values) {
+      const averageFunc = arr => arr.reduce((p, c) => p + c, 0) / arr.length
+      var avg = averageFunc(values)
+
+      var squareDiffs = values.map(function (value) {
+        var diff = value - avg
+        var sqrDiff = diff * diff
+        return sqrDiff
+      })
+
+      var avgSquareDiff = averageFunc(squareDiffs)
+
+      var stdDev = Math.sqrt(avgSquareDiff)
+      return stdDev
+    },
+
     getColour (fitness, minFitness, maxFitness, fitnesses, local) {
       // local - locally colour scale fitness value
       if (local) {
@@ -825,7 +849,7 @@ export default {
         alert('Evolution ended with code ' + code)
       }
       var evolutionData = self.evolution
-      if (code === 99999) {
+      if (code === 99999) { // Terminate evolution
         evolutionData[evolutionData.length - 1].best = -1111111
         evolutionData[evolutionData.length - 1].avg = -1111111
         evolutionData[evolutionData.length - 1].std = -1111111
