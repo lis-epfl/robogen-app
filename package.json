@@ -23,7 +23,7 @@
   },
   "build": {
     "productName": "Robogen",
-    "appId": "org.lis.erobogen",
+    "appId": "org.lis.robogen",
     "directories": {
       "output": "build"
     },
